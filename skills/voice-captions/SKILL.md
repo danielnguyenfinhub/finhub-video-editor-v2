@@ -1,6 +1,6 @@
 ---
 name: voice-captions
-description: "Generates the voiceover (Gemini Charon, then ElevenLabs, then OpenAI TTS) and word-level timings (Whisper) that drive captions and keyframe sync, plus optional Tone.js SFX. Use when a video needs narration, re-voicing after a script change, captions for supplied audio, or a check that narration fits scene lengths. Not for mixing/loudness of the final MP4 (render-qa) or for writing the script (video-planner)."
+description: "Generates the voiceover (Gemini Charon, then ElevenLabs, then ElevenLabs v3 via fal, then OpenAI TTS) and word-level timings (Whisper) that drive captions and keyframe sync, plus optional Tone.js SFX. Use when a video needs narration, re-voicing after a script change, captions for supplied audio, or a check that narration fits scene lengths. Not for mixing/loudness of the final MP4 (render-qa) or for writing the script (video-planner)."
 ---
 
 # Voice and Captions
@@ -33,7 +33,8 @@ provider-specific alignment format.
 | --- | --- |
 | `GEMINI_API_KEY` set | Gemini TTS, voice `Charon` (or `--voice` / `GEMINI_VOICE`). Model `gemini-2.5-pro-preview-tts`, then `gemini-2.5-flash-preview-tts` on 429; `GEMINI_TTS_MODEL` overrides. Empty-audio replies retry twice, then next model |
 | `ELEVENLABS_API_KEY` starts with `sk_` | ElevenLabs (`eleven_multilingual_v2`; set `ELEVENLABS_MODEL=eleven_v3` for Vietnamese); `--voice` is required |
-| Key missing or is a key ID | OpenAI `gpt-4o-mini-tts`, voice `alloy` unless the spec names one |
+| `FAL_KEY` set (ElevenLabs key missing or a key ID) | fal `fal-ai/elevenlabs/tts/eleven-v3`, voice `--voice` (an ElevenLabs voice name or ID; fal default "Rachel"). Listed by fal at $0.10 per 1,000 characters (fal model page, read 2026-10-18). Returns word timings, used only if Whisper fails (`voice.json` `"timing": "tts"`) |
+| None of the above | OpenAI `gpt-4o-mini-tts`, voice `alloy` unless the spec names one |
 | `auto` hits 401/403 or final-model 429 | Moves to the next provider; reasons are in `voice.json` `tried`. Explicit `--provider X` exits on failure |
 | Every TTS API fails with auth or quota | Do not retry; retries burn nothing but time. If the session has the ElevenLabs MCP, use `creative_generate_speech`, save the MP3, then run the script with `--audio`. Otherwise report **Blocked: voice provider** |
 | Whisper API out of quota | Re-run with `--local` (faster-whisper; needs huggingface.co reachable once to fetch the model) |

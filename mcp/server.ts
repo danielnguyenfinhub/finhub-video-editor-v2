@@ -168,11 +168,13 @@ const build = () => {
     {
       title: "Generate voiceover and word timings",
       description:
-        "Join the spec voiceovers, voice them (Gemini Charon, then ElevenLabs, then OpenAI) and align words with Whisper into public/voice.mp3 + public/words.json. Spends API credits.",
+        "Join the spec voiceovers, voice them (Gemini Charon, then ElevenLabs, then ElevenLabs v3 via fal, then OpenAI) and align words with Whisper into public/voice.mp3 + public/words.json. Spends API credits.",
       inputSchema: {
         ...SpecInput,
         voice: z.string().optional(),
-        provider: z.enum(["auto", "gemini", "elevenlabs", "openai"]).optional(),
+        provider: z
+          .enum(["auto", "gemini", "elevenlabs", "fal", "openai"])
+          .optional(),
       },
     },
     async (a) => {

@@ -44178,11 +44178,11 @@ var build = () => {
     "make_voiceover",
     {
       title: "Generate voiceover and word timings",
-      description: "Join the spec voiceovers, voice them (Gemini Charon, then ElevenLabs, then OpenAI) and align words with Whisper into public/voice.mp3 + public/words.json. Spends API credits.",
+      description: "Join the spec voiceovers, voice them (Gemini Charon, then ElevenLabs, then ElevenLabs v3 via fal, then OpenAI) and align words with Whisper into public/voice.mp3 + public/words.json. Spends API credits.",
       inputSchema: {
         ...SpecInput,
         voice: external_exports.string().optional(),
-        provider: external_exports.enum(["auto", "gemini", "elevenlabs", "openai"]).optional()
+        provider: external_exports.enum(["auto", "gemini", "elevenlabs", "fal", "openai"]).optional()
       }
     },
     async (a) => {

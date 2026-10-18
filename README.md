@@ -36,7 +36,7 @@ to approve before the full render.
 - **First run:** the connector runs `npm ci` once inside the plugin folder (about 1–2 minutes), then
   starts. The machine needs Node 20+, Python 3 with `requests`, and FFmpeg on the PATH.
 - **API keys:** desktop apps don't see your shell variables, so put keys in a `.env` file in the studio folder:
-  `GEMINI_API_KEY=…` (Charon voice), optionally `ELEVENLABS_API_KEY=sk_…` and `OPENAI_API_KEY=…`.
+  `GEMINI_API_KEY=…` (Charon voice), optionally `ELEVENLABS_API_KEY=sk_…`, `FAL_KEY=…` (ElevenLabs v3 billed through fal) and `OPENAI_API_KEY=…`.
   To use your own clone instead of the plugin copy, set `STUDIO_DIR=/path/to/clone`.
 
 ## Hosted connector (any device, e.g. Railway)
