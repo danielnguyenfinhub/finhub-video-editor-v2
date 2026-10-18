@@ -11,11 +11,13 @@ export const usePortrait = () => {
 	return height > width;
 };
 
+// Portrait captions (Captions.tsx, 72px, up to 2 lines) rise to y≈1300 above the bottom 20% platform band.
+const PORTRAIT_CAPTION_RESERVE = 240;
 /**
- * Portrait design box = the 9:16 safe area of 1080x1920 (safeFor: 54 left, 162 right, 96 top, 384 bottom),
- * so Stage scales by k=1 and design px are output px. Scenes lay out for this box directly.
+ * Portrait design box = the 9:16 safe area of 1080x1920 (safeFor: 54 left, 162 right, 96 top, 384 bottom)
+ * minus the caption band, so Stage scales by k=1 and design px are output px. Scenes lay out for this box.
  */
-export const PORTRAIT_BOX = {w: 864, h: 1440};
+export const PORTRAIT_BOX = {w: 864, h: 1440 - PORTRAIT_CAPTION_RESERVE};
 /**
  * CSS zoom for 1080p UI components in portrait: their 28px secondary text renders at 32px, 40px body at 46px.
  * Zoom (not transform) so the zoomed component also takes up the larger layout space.
@@ -38,7 +40,7 @@ export const Stage: React.FC<{
 	const {width, height} = useVideoConfig();
 	const safe = safeFor(width, height);
 	const portrait = height > width;
-	const bottom = safe.bottom + (portrait ? 0 : CAPTION_RESERVE * (width / 1920));
+	const bottom = safe.bottom + (portrait ? PORTRAIT_CAPTION_RESERVE * (width / 1080) : CAPTION_RESERVE * (width / 1920));
 	const boxW = width - safe.left - safe.right;
 	const boxH = height - safe.top - bottom;
 	const k = Math.min(1, boxW / w, boxH / h);

@@ -24,7 +24,7 @@ export const SceneSolution: React.FC<SceneProps & {hasVoice: boolean}> = ({scene
 
 	return (
 		<Stage w={portrait ? PORTRAIT_BOX.w : 1160} h={portrait ? PORTRAIT_BOX.h : 900} background={`linear-gradient(180deg, ${COLORS.primarySoft}, ${COLORS.canvas})`}>
-			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: portrait ? 64 : 40, fontFamily}}>
+			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: portrait ? 48 : 40, fontFamily}}>
 				<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center'}}>
 					<SpringScale at={tTitle} bouncy>
 						<span style={{fontSize: portrait ? 120 : 104, fontWeight: 800, color: meta.brand.primary, letterSpacing: -2, lineHeight: 1.05}}>
@@ -49,7 +49,7 @@ export const SceneSolution: React.FC<SceneProps & {hasVoice: boolean}> = ({scene
 					elapsedSec={Math.max(0, frame - tAnswer) / fps}
 					style={portrait ? {width: PORTRAIT_BOX.w / PORTRAIT_ZOOM} : undefined}
 				>
-					<div style={{height: portrait ? 140 : 110}}>
+					<div style={{height: portrait ? 100 : 110}}>
 						<VoiceWaveform src={hasVoice ? staticFile('voice.mp3') : undefined} color={COLORS.success} active={answered} />
 					</div>
 				</AnsweredCallCard>
