@@ -8,3 +8,4 @@ __pycache__/
 .harnesskit/
 .DS_Store
 data/outputs/*.json
+!mcp/dist/
