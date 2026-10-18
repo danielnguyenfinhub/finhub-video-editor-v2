@@ -1,0 +1,7 @@
+node_modules
+out
+_workspace
+_workspace_*
+data/outputs/*.json
+.env
+.git

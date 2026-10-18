@@ -30,7 +30,7 @@ pipelines/                                  # voice.ts (ElevenLabs), transcribe.
 data/templates/video-spec.json              # starter spec; copy to _workspace/01_planner_scenes.json
 data/outputs/                               # render manifests written by pipelines/render.ts
 ```
-Topic notes for quick reference: `.claude/skills/remotion-rules.md`, `gsap-motion.md`, `audio-sync.md`.
+Topic notes for quick reference: `skills/remotion-rules.md`, `gsap-motion.md`, `audio-sync.md`.
 Before writing a new primitive, check `components/motion/` and `components/ui/`; reuse beats re-writing.
 
 The composition reads its props from `_workspace/01_planner_scenes.json` (passed with `--props`).

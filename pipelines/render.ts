@@ -55,7 +55,7 @@ const main = async () => {
 	// probe checks spec.meta width/height, so give it the composition's real size
 	const tmpSpec = `out/.probe_spec_${comp}.json`;
 	writeFileSync(tmpSpec, JSON.stringify({...spec, meta: {...spec.meta, width: W, height: H}}));
-	const pr = run('python3', ['.claude/skills/render-qa/scripts/probe.py', out, '--spec', tmpSpec]);
+	const pr = run('python3', ['skills/render-qa/scripts/probe.py', out, '--spec', tmpSpec]);
 	let probe: unknown;
 	try { probe = JSON.parse(pr.stdout); } catch { probe = {error: pr.stdout + pr.stderr}; }
 

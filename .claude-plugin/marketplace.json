@@ -1,0 +1,16 @@
+{
+  "name": "finhub-video",
+  "description": "Daniel Nguyen's FinHub video tools for Claude Code and Cowork.",
+  "owner": {
+    "name": "Daniel Nguyen",
+    "email": "daniel@finhub.net.au"
+  },
+  "plugins": [
+    {
+      "name": "finhub-video-studio",
+      "description": "FinHub Video-as-Code studio: agent team, skills and the video studio connector.",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}

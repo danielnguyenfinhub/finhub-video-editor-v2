@@ -5,6 +5,23 @@ description: "Orchestrates the FinHub Video-as-Code studio: brief → scene spec
 
 # Video Studio Orchestrator
 
+## Running in Cowork or as a plugin
+
+When the `finhub-video-studio` connector tools are available (Cowork, or the plugin in any client),
+run the pipeline steps through them instead of shell commands, because the studio files may not be
+in the working folder:
+
+| Step | Tool |
+| --- | --- |
+| Validate the spec (always first; free) | `check_spec` (pass `spec` inline or `specPath`) |
+| Voice + word timings (spends credits) | `make_voiceover` |
+| Render, master, probe (2–3 min) | `build_video`, then poll `get_job` until `done`/`failed` |
+| Show finished videos and their QA | `list_outputs` |
+
+Report each `get_job`/`list_outputs` probe result as-is: "blocked: voice" failures are not passes.
+Loaded as a plugin, the agent types are prefixed: `finhub-video-studio:video-planner`, and so on.
+Use the prefixed name in `agentType`/`subagent_type` when the bare name is not found.
+
 ## Execution mode: mixed
 
 | Phase | Mode | Why |

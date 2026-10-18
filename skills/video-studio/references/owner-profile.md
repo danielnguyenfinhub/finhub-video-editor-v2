@@ -16,7 +16,7 @@ templates or concept. A brief that says otherwise wins.
 | Vietnamese with ElevenLabs | Use `eleven_v3`; `eleven_multilingual_v2` doesn't speak Vietnamese well | `scripts/voice-video.mjs` line 66 |
 | API keys | Read keys only in Node/Python scripts, **never in a `.tsx` component**, because Remotion exposes `.env` to the browser bundle | `docs/agents/api-keys.md` |
 | Contact details | **None are stored in the source.** The CTA website and phone must come from Daniel per video | `docs/agents/brand-assets.md` ("EndCard") |
-| Compliance | Credit/rate content follows ASIC RG 234: no rate without a comparison rate, and a disclaimer does not cure a misleading claim | `scripts/voice-video.mjs` line 208, `.claude/skills/video-compliance-review` |
+| Compliance | Credit/rate content follows ASIC RG 234: no rate without a comparison rate, and a disclaimer does not cure a misleading claim | `scripts/voice-video.mjs` line 208, `.claude/skills/video-compliance-review` (reference repo) |
 
 ## How the planner applies this
 - For a FinHub video, use `meta.language: "vi+en"`, the brand colours above, Be Vietnam Pro, and the logo on a white card.

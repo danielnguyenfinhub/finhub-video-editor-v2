@@ -1,0 +1,8 @@
+{
+  "name": "finhub-video-studio",
+  "version": "0.1.0",
+  "description": "FinHub Video-as-Code studio: a six-agent team (planner, UI, audio, motion, render, QA) plus a connector that validates scene specs, voices narration (Gemini Charon), renders 16:9 and 9:16 Remotion videos, masters audio and runs QA probes.",
+  "author": {"name": "Daniel Nguyen", "email": "daniel@finhub.net.au"},
+  "repository": "https://github.com/danielnguyenfinhub/finhub-video-editor-v2",
+  "keywords": ["video", "remotion", "motion-graphics", "voiceover", "finhub"]
+}

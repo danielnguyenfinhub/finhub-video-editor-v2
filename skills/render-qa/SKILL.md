@@ -49,7 +49,7 @@ ffmpeg -y -i out/raw.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" -
 ## 3. Objective checks (script)
 
 ```bash
-python3 .claude/skills/render-qa/scripts/probe.py out/<file>.mp4 \
+python3 skills/render-qa/scripts/probe.py out/<file>.mp4 \
   --spec _workspace/01_planner_scenes.json --stills _workspace/05_qa_stills
 ```
 Exit code 1 means at least one check failed. The JSON names the check and the measured value. Black
