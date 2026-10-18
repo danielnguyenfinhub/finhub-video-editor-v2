@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="160" viewBox="0 0 720 160" role="img" aria-label="ReceptionAI">
+  <rect x="8" y="24" width="112" height="112" rx="28" fill="#4f46e5"/>
+  <path d="M44 58c0-4 3-7 7-7h10l6 16-8 6c4 9 11 16 20 20l6-8 16 6v10c0 4-3 7-7 7-28 0-50-22-50-50z" fill="#ffffff"/>
+  <circle cx="98" cy="46" r="9" fill="#F472B6"/>
+  <text x="144" y="112" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-size="84" font-weight="800" letter-spacing="-2" fill="#4f46e5">Reception<tspan fill="#F472B6">AI</tspan></text>
+</svg>
