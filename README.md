@@ -25,8 +25,9 @@ public/                    fonts, logo, voice.mp3, words.json
 ## Install as a plugin (Cowork or Claude Code)
 
 The repo is a plugin (`.claude-plugin/`) and its own marketplace. It brings the six agents, the skills and
-the **finhub-video-studio connector**, an MCP server with `check_spec`, `make_voiceover`, `build_video`,
-`get_job` and `list_outputs`.
+the **finhub-video-studio connector**, an MCP server with `check_spec`, `make_voiceover`, `preview_stills`,
+`build_video`, `get_job` and `list_outputs`. `preview_stills` returns a contact sheet (one still per scene)
+to approve before the full render.
 
 - **Claude Code:** `/plugin marketplace add danielnguyenfinhub/finhub-video-editor-v2`, then
   `/plugin install finhub-video-studio@finhub-video`
@@ -44,7 +45,7 @@ The same server runs over HTTP: `npx tsx mcp/server.ts --http`, or `docker build
 - **Variables:** `MCP_AUTH_TOKEN` (required; long random string), `PORT`, and the voice keys.
 - **Connecting Cowork:** add a custom connector with URL `https://<host>/mcp` and header
   `Authorization: Bearer <MCP_AUTH_TOKEN>`.
-- **Downloads:** finished MP4s are at `GET /files/<name>.mp4`, with the same header.
+- **Downloads:** finished MP4s are at `GET /files/<name>.mp4` and stills sheets at `GET /files/<name>_stills.jpg`, with the same header.
 - **Costs:** renders take 2–3 minutes of CPU each, and hosting costs money.
 - **Status:** the Dockerfile has not yet been build-tested.
 
@@ -56,6 +57,7 @@ Check the connector locally: `npx tsx mcp/smoke.ts`.
 npm ci
 npm run studio                      # preview
 npm run voice && npm run transcribe # needs an sk_ ElevenLabs key; OpenAI key with credits for Whisper API
+npm run stills                      # out/<slug>_PromoVideo_stills.jpg: approve before rendering
 npm run build:video                 # out/<slug>_<WxH>.mp4 + data/outputs/<manifest>.json
 ```
 

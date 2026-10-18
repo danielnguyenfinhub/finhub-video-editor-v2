@@ -44124,6 +44124,34 @@ var specFile = ({
   return f;
 };
 var jobs = /* @__PURE__ */ new Map();
+var notInstalled = () => existsSync(join(ROOT, "node_modules", ".bin", "tsx")) ? null : text({
+  status: "installing",
+  message: "The studio is still installing its render dependencies (first run, 1\u20132 minutes). Try again shortly."
+});
+var startJob = (kind, comp, script, spec) => {
+  const id = randomUUID().slice(0, 8);
+  const job = {
+    status: "running",
+    log: "",
+    started: (/* @__PURE__ */ new Date()).toISOString(),
+    comp,
+    kind
+  };
+  jobs.set(id, job);
+  const p = spawn("npx", ["tsx", script, "--spec", spec, "--comp", comp], {
+    cwd: ROOT,
+    env: process.env
+  });
+  const add = (b) => {
+    job.log = (job.log + b.toString()).slice(-2e4);
+  };
+  p.stdout.on("data", add);
+  p.stderr.on("data", add);
+  p.on("close", (code) => {
+    job.status = code === 0 ? "done" : "failed";
+  });
+  return id;
+};
 var build = () => {
   const s = new McpServer({ name: "finhub-video-studio", version: "0.1.0" });
   s.registerTool(
@@ -44179,6 +44207,21 @@ var build = () => {
     }
   );
   s.registerTool(
+    "preview_stills",
+    {
+      title: "Preview one still per scene",
+      description: "Approval gate before build_video: renders one still per scene (80% into each scene) and a contact sheet. Takes about 30 seconds; poll get_job, which returns the contact sheet as an image. Show it to the user and get approval before build_video.",
+      inputSchema: {
+        ...SpecInput,
+        comp: external_exports.enum(["PromoVideo", "PromoVideo-9x16"]).default("PromoVideo")
+      }
+    },
+    async (a) => notInstalled() ?? text({
+      jobId: startJob("stills", a.comp, "pipelines/stills.ts", specFile(a)),
+      status: "running"
+    })
+  );
+  s.registerTool(
     "build_video",
     {
       title: "Render, master and QA-probe a video",
@@ -44188,41 +44231,17 @@ var build = () => {
         comp: external_exports.enum(["PromoVideo", "PromoVideo-9x16"]).default("PromoVideo")
       }
     },
-    async (a) => {
-      if (!existsSync(join(ROOT, "node_modules", ".bin", "tsx")))
-        return text({
-          status: "installing",
-          message: "The studio is still installing its render dependencies (first run, 1\u20132 minutes). Try again shortly."
-        });
-      const id = randomUUID().slice(0, 8);
-      const job = {
-        status: "running",
-        log: "",
-        started: (/* @__PURE__ */ new Date()).toISOString(),
-        comp: a.comp
-      };
-      jobs.set(id, job);
-      const p = spawn(
-        "npx",
-        ["tsx", "pipelines/render.ts", "--spec", specFile(a), "--comp", a.comp],
-        { cwd: ROOT, env: process.env }
-      );
-      const add = (b) => {
-        job.log = (job.log + b.toString()).slice(-2e4);
-      };
-      p.stdout.on("data", add);
-      p.stderr.on("data", add);
-      p.on("close", (code) => {
-        job.status = code === 0 ? "done" : "failed";
-      });
-      return text({ jobId: id, status: "running" });
-    }
+    // The launcher installs render dependencies in the background on first run.
+    async (a) => notInstalled() ?? text({
+      jobId: startJob("video", a.comp, "pipelines/render.ts", specFile(a)),
+      status: "running"
+    })
   );
   s.registerTool(
     "get_job",
     {
       title: "Check a render job",
-      description: "Status of a build_video job; when done, includes the output path, manifest and probe result.",
+      description: "Status of a build_video or preview_stills job. A finished render includes the output path, manifest and probe result; finished stills include the contact sheet as an image.",
       inputSchema: { jobId: external_exports.string() }
     },
     async ({ jobId }) => {
@@ -44231,6 +44250,24 @@ var build = () => {
         return text({
           error: `unknown job ${jobId} (server restarted?); see list_outputs`
         });
+      if (j.kind === "stills") {
+        const st = j.log.match(/sheet (\S+)\nstills (\S+)/);
+        const info = text({
+          jobId,
+          status: j.status,
+          comp: j.comp,
+          sheet: st?.[1],
+          stills: st && JSON.parse(readFileSync(join(ROOT, st[2]), "utf8")).stills,
+          logTail: j.status === "done" ? void 0 : j.log.slice(-2e3)
+        });
+        if (!st) return info;
+        const image = {
+          type: "image",
+          data: readFileSync(join(ROOT, st[1])).toString("base64"),
+          mimeType: "image/jpeg"
+        };
+        return { content: [...info.content, image] };
+      }
       const m = j.log.match(/output (\S+)\nmanifest (\S+)/);
       const manifest = m && existsSync(join(ROOT, m[2])) ? JSON.parse(readFileSync(join(ROOT, m[2]), "utf8")) : null;
       return text({
@@ -44279,7 +44316,7 @@ if (process.argv.includes("--http")) {
       res.writeHead(401).end();
       return;
     }
-    const file2 = req.url?.match(/^\/files\/([\w.-]+\.mp4)$/)?.[1];
+    const file2 = req.url?.match(/^\/files\/([\w.-]+\.(?:mp4|jpg))$/)?.[1];
     if (req.method === "GET" && file2) {
       const f = join(ROOT, "out", basename(file2));
       if (!existsSync(f)) {
@@ -44287,7 +44324,7 @@ if (process.argv.includes("--http")) {
         return;
       }
       res.writeHead(200, {
-        "content-type": "video/mp4",
+        "content-type": file2.endsWith(".jpg") ? "image/jpeg" : "video/mp4",
         "content-length": statSync(f).size
       });
       createReadStream(f).pipe(res);
