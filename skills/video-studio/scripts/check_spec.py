@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate a scene spec against the rules in references/scene-spec.md.
 
-  check_spec.py _workspace/01_planner_scenes.json     # prints problems, exit 1 if any
+  check_spec.py _workspace/01_planner_scenes.json     # prints problems (exit 1) and warnings (exit 0)
   check_spec.py --selftest
 """
 import json, re, sys
@@ -43,6 +43,28 @@ def problems(spec):
     return out
 
 
+# Filler that makes a scene decorate instead of say something (idea from OpenMontage's variation check).
+FILLER = re.compile(r"\b(cutting-edge|state-of-the-art|next-generation|revolutionary|seamless(ly)?|game-chang\w*|innovative|stunning|breathtaking|in today's world)\b", re.I)
+
+
+def warnings(spec):
+    """Slideshow risks: worth fixing before credits are spent, but not blockers."""
+    out, scenes = [], spec.get("scenes", [])
+    for a, b in zip(scenes, scenes[1:]):
+        if a.get("ui") and a.get("ui") == b.get("ui"):
+            out.append(f"{a['id']}→{b['id']}: same UI {a['ui']} twice in a row reads as a slideshow")
+    for s in scenes:
+        sid, dur = s.get("id", "?"), s["endSec"] - s["startSec"]
+        if not s.get("motion", "").strip():
+            out.append(f"{sid}: no motion intent; say what moves and on which word")
+        words = sum(len(t.split()) for t in s.get("onScreenText", []))
+        if dur > 0 and words > 1.5 * dur:
+            out.append(f"{sid}: {words} on-screen words in {dur}s is text-first; move words to the voiceover")
+        for m in FILLER.finditer(s.get("voiceover", "") + " " + " ".join(s.get("onScreenText", []))):
+            out.append(f"{sid}: filler word '{m.group(0)}'; replace with a concrete claim")
+    return out
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["--selftest"]:
         good = {"meta": {"fps": 30, "width": 1920, "height": 1080, "slug": "x"},
@@ -54,7 +76,13 @@ if __name__ == "__main__":
         bad["scenes"][1]["voiceover"] = "Low home loan rates now available today"
         p = problems(bad)
         assert any("gap" in x for x in p) and any("words" in x for x in p) and any("compliance" in x for x in p), p
+        assert len(warnings(good)) == 2, warnings(good)  # neither scene has motion intent
+        bad["scenes"][0].update(ui=["Card"], motion="slides in")
+        bad["scenes"][1].update(ui=["Card"], motion="x", onScreenText=["A seamless revolutionary app"])
+        w = warnings(bad)
+        assert any("same UI" in x for x in w) and sum("filler" in x for x in w) == 2 and any("text-first" in x for x in w), w
         print("selftest ok"); sys.exit(0)
-    found = problems(json.load(open(sys.argv[1])))
-    print("\n".join(found) or "spec ok")
+    spec = json.load(open(sys.argv[1]))
+    found = problems(spec)
+    print("\n".join(found + ["warn: " + w for w in warnings(spec)]) or "spec ok")
     sys.exit(1 if found else 0)

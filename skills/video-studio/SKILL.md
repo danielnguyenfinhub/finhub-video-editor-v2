@@ -13,8 +13,9 @@ in the working folder:
 
 | Step | Tool |
 | --- | --- |
-| Validate the spec (always first; free) | `check_spec` (pass `spec` inline or `specPath`) |
+| Validate the spec (always first; free) | `check_spec` (pass `spec` inline or `specPath`); fix `problems`, and fix or justify `warnings` |
 | Voice + word timings (spends credits) | `make_voiceover` |
+| Stills approval (about 30 s; never skipped before a first render) | `preview_stills`, poll `get_job`, show the contact sheet, wait for the user's approval |
 | Render, master, probe (2–3 min) | `build_video`, then poll `get_job` until `done`/`failed` |
 | Show finished videos and their QA | `list_outputs` |
 
@@ -28,6 +29,7 @@ Use the prefixed name in `agentType`/`subagent_type` when the bare name is not f
 | --- | --- | --- |
 | 0–1 Intake | main agent | Needs the user conversation |
 | 2 Production | **Workflow** | Order, parallelism and the QA retry limit are fixed in code, so a run is repeatable and resumable |
+| 2b Stills gate | main agent | The Workflow stops after Motion with a contact sheet; the human approves before render time is spent |
 | 3 Approval | main agent | A human decision; never automated |
 
 Invoking this skill counts as consent to run the Workflow below. Default size is 6–12 agent calls. If
@@ -55,7 +57,7 @@ Data contract: `references/scene-spec.md`. Every file handoff goes through `_wor
 | No `_workspace/` | Full run |
 | `_workspace/` exists and the request is a partial fix ("only re-voice", "fix scene 3") | Run only the owning agent(s), then Render + QA. If `_workspace/run_meta.json` has a `runId`, prefer `resumeFromRunId` with the script edited for that phase |
 | `_workspace/` exists and the brief is new | `mv _workspace _workspace_<YYYYMMDD-HHMM>`, then a full run |
-| Resize / variants only | Render + QA phases only, with `args.variants` / aspect set |
+| Resize / variants only | Render + QA phases only, with `args.variants` / aspect set and `args.stillsApproved: true` (the look is already approved) |
 
 ## Phase 1: intake (main agent)
 
@@ -66,13 +68,13 @@ rate content, **the verbatim disclaimer text**. Write the brief to `_workspace/0
 ## Phase 2: production (Workflow)
 
 Call `Workflow` with this script and `args: {brief: <brief text>, maxFixRounds: 2}`. Save the returned
-`runId` to `_workspace/run_meta.json`.
+`runId` to `_workspace/run_meta.json`. The first call stops at `stage: 'stills'`; see Phase 2b.
 
 ```javascript
 export const meta = {
   name: 'video-studio-run',
   description: 'Plan, build, animate, render and QA a programmatic video',
-  phases: [{ title: 'Plan' }, { title: 'Build' }, { title: 'Motion' }, { title: 'Render+QA' }],
+  phases: [{ title: 'Plan' }, { title: 'Build' }, { title: 'Motion' }, { title: 'Stills' }, { title: 'Render+QA' }],
 }
 
 const STEP = { type: 'object', required: ['ok', 'summary'], properties: {
@@ -114,6 +116,14 @@ const motion = await agent('Write Root, the PromoVideo composition and every sce
 note('motion-designer', motion)
 if (!motion || !motion.ok) return { stage: 'motion', motion, blocked, openQuestions: plan.openQuestions }
 
+if (!args.stillsApproved) {   // approval gate: no render time until a human has seen every scene
+  phase('Stills')
+  const stills = await agent('Render the stills contact sheet (npm run stills) for each requested composition. Do not render video. Return the sheet path(s) in summary.',
+    { agentType: 'render-engineer', phase: 'Stills', schema: STEP })
+  note('render-engineer(stills)', stills)
+  return { stage: 'stills', stills, blocked, openQuestions: plan.openQuestions }
+}
+
 phase('Render+QA')
 let qa = null, round = 0
 const limit = args.maxFixRounds ?? 2
@@ -137,6 +147,18 @@ while (true) {
 }
 return { qa, rounds: round, blocked, openQuestions: plan.openQuestions }
 ```
+
+## Phase 2b: stills approval (main agent; never skipped before a first render)
+
+1. Show the contact sheet (`out/<slug>_<comp>_stills.jpg`; one tile per scene, in scene order, taken
+   80% into each scene) and list the scene ids with their times from
+   `out/stills/<slug>_<comp>/stills.json`. Add any `check_spec` warnings the planner kept.
+2. Ask for approval or per-scene changes. Never treat silence or an unrelated reply as approval.
+3. Approved: call `Workflow` again with the same script, `args.stillsApproved: true` and
+   `resumeFromRunId` from `run_meta.json`; the earlier phases replay from cache and only Render+QA runs.
+4. Changes requested: run only the owning agent(s) with the feedback (layout or motion →
+   motion-designer, UI realism or brand → ui-asset-builder, script or structure → video-planner), then
+   `npm run stills` again and repeat from step 1.
 
 ## Phase 3: human approval (main agent; never skipped)
 
@@ -162,7 +184,7 @@ return { qa, rounds: round, blocked, openQuestions: plan.openQuestions }
 ## Test scenarios
 
 **Normal:** "Make the 60 s AI-receptionist salon ad, 16:9, pink accent, CTA example.com." Plan returns
-no problems → UI ∥ Audio → Motion → render → QA finds one clipped headline (major, motion-designer) →
+no problems → UI ∥ Audio → Motion → stills sheet → Daniel approves → render → QA finds one clipped headline (major, motion-designer) →
 fix round 1 → QA pass. Expected: `out/ai-receptionist-salon_1920x1080.mp4`, probe pass,
 `_workspace/05_qa_report.json` `pass: true`, status Done after approval.
 

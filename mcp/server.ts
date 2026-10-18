@@ -93,8 +93,48 @@ type Job = {
   log: string;
   started: string;
   comp: string;
+  kind: "video" | "stills";
 };
 const jobs = new Map<string, Job>();
+
+const notInstalled = () =>
+  existsSync(join(ROOT, "node_modules", ".bin", "tsx"))
+    ? null
+    : text({
+        status: "installing",
+        message:
+          "The studio is still installing its render dependencies (first run, 1–2 minutes). Try again shortly.",
+      });
+
+const startJob = (
+  kind: Job["kind"],
+  comp: string,
+  script: string,
+  spec: string,
+) => {
+  const id = randomUUID().slice(0, 8);
+  const job: Job = {
+    status: "running",
+    log: "",
+    started: new Date().toISOString(),
+    comp,
+    kind,
+  };
+  jobs.set(id, job);
+  const p = spawn("npx", ["tsx", script, "--spec", spec, "--comp", comp], {
+    cwd: ROOT,
+    env: process.env,
+  });
+  const add = (b: Buffer) => {
+    job.log = (job.log + b.toString()).slice(-20000);
+  };
+  p.stdout.on("data", add);
+  p.stderr.on("data", add);
+  p.on("close", (code) => {
+    job.status = code === 0 ? "done" : "failed";
+  });
+  return id;
+};
 
 const build = () => {
   const s = new McpServer({ name: "finhub-video-studio", version: "0.1.0" });
@@ -104,7 +144,7 @@ const build = () => {
     {
       title: "Validate a scene spec",
       description:
-        "Check a scene spec before spending credits: contiguous scenes, ≤2.5 words/sec voiceover pace, sNN-kebab ids, and credit/rate language without a compliance disclaimer.",
+        "Check a scene spec before spending credits: contiguous scenes, ≤2.5 words/sec voiceover pace, sNN-kebab ids, and credit/rate language without a compliance disclaimer (problems). Also flags slideshow risks: repeated UI, missing motion intent, text-first scenes, filler words (warnings).",
       inputSchema: SpecInput,
     },
     async (a) => {
@@ -112,9 +152,13 @@ const build = () => {
         "skills/video-studio/scripts/check_spec.py",
         specFile(a),
       ]);
+      const lines = r.out.split("\n").filter((l) => l && l !== "spec ok");
       return text({
         ok: r.code === 0,
-        problems: r.code === 0 ? [] : r.out.split("\n"),
+        problems: lines.filter((l) => !l.startsWith("warn: ")),
+        warnings: lines
+          .filter((l) => l.startsWith("warn: "))
+          .map((l) => l.slice(6)),
       });
     },
   );
@@ -124,11 +168,13 @@ const build = () => {
     {
       title: "Generate voiceover and word timings",
       description:
-        "Join the spec voiceovers, voice them (Gemini Charon, then ElevenLabs, then OpenAI) and align words with Whisper into public/voice.mp3 + public/words.json. Spends API credits.",
+        "Join the spec voiceovers, voice them (Gemini Charon, then ElevenLabs, then ElevenLabs v3 via fal, then OpenAI) and align words with Whisper into public/voice.mp3 + public/words.json. Spends API credits.",
       inputSchema: {
         ...SpecInput,
         voice: z.string().optional(),
-        provider: z.enum(["auto", "gemini", "elevenlabs", "openai"]).optional(),
+        provider: z
+          .enum(["auto", "gemini", "elevenlabs", "fal", "openai"])
+          .optional(),
       },
     },
     async (a) => {
@@ -156,6 +202,25 @@ const build = () => {
   );
 
   s.registerTool(
+    "preview_stills",
+    {
+      title: "Preview one still per scene",
+      description:
+        "Approval gate before build_video: renders one still per scene (80% into each scene) and a contact sheet. Takes about 30 seconds; poll get_job, which returns the contact sheet as an image. Show it to the user and get approval before build_video.",
+      inputSchema: {
+        ...SpecInput,
+        comp: z.enum(["PromoVideo", "PromoVideo-9x16"]).default("PromoVideo"),
+      },
+    },
+    async (a) =>
+      notInstalled() ??
+      text({
+        jobId: startJob("stills", a.comp, "pipelines/stills.ts", specFile(a)),
+        status: "running",
+      }),
+  );
+
+  s.registerTool(
     "build_video",
     {
       title: "Render, master and QA-probe a video",
@@ -166,37 +231,13 @@ const build = () => {
         comp: z.enum(["PromoVideo", "PromoVideo-9x16"]).default("PromoVideo"),
       },
     },
-    async (a) => {
-      // The launcher installs render dependencies in the background on first run.
-      if (!existsSync(join(ROOT, "node_modules", ".bin", "tsx")))
-        return text({
-          status: "installing",
-          message:
-            "The studio is still installing its render dependencies (first run, 1–2 minutes). Try again shortly.",
-        });
-      const id = randomUUID().slice(0, 8);
-      const job: Job = {
+    // The launcher installs render dependencies in the background on first run.
+    async (a) =>
+      notInstalled() ??
+      text({
+        jobId: startJob("video", a.comp, "pipelines/render.ts", specFile(a)),
         status: "running",
-        log: "",
-        started: new Date().toISOString(),
-        comp: a.comp,
-      };
-      jobs.set(id, job);
-      const p = spawn(
-        "npx",
-        ["tsx", "pipelines/render.ts", "--spec", specFile(a), "--comp", a.comp],
-        { cwd: ROOT, env: process.env },
-      );
-      const add = (b: Buffer) => {
-        job.log = (job.log + b.toString()).slice(-20000);
-      };
-      p.stdout.on("data", add);
-      p.stderr.on("data", add);
-      p.on("close", (code) => {
-        job.status = code === 0 ? "done" : "failed";
-      });
-      return text({ jobId: id, status: "running" });
-    },
+      }),
   );
 
   s.registerTool(
@@ -204,7 +245,7 @@ const build = () => {
     {
       title: "Check a render job",
       description:
-        "Status of a build_video job; when done, includes the output path, manifest and probe result.",
+        "Status of a build_video or preview_stills job. A finished render includes the output path, manifest and probe result; finished stills include the contact sheet as an image.",
       inputSchema: { jobId: z.string() },
     },
     async ({ jobId }) => {
@@ -213,6 +254,25 @@ const build = () => {
         return text({
           error: `unknown job ${jobId} (server restarted?); see list_outputs`,
         });
+      if (j.kind === "stills") {
+        const st = j.log.match(/sheet (\S+)\nstills (\S+)/);
+        const info = text({
+          jobId,
+          status: j.status,
+          comp: j.comp,
+          sheet: st?.[1],
+          stills:
+            st && JSON.parse(readFileSync(join(ROOT, st[2]), "utf8")).stills,
+          logTail: j.status === "done" ? undefined : j.log.slice(-2000),
+        });
+        if (!st) return info;
+        const image = {
+          type: "image" as const,
+          data: readFileSync(join(ROOT, st[1])).toString("base64"),
+          mimeType: "image/jpeg",
+        };
+        return { content: [...info.content, image] };
+      }
       const m = j.log.match(/output (\S+)\nmanifest (\S+)/);
       const manifest =
         m && existsSync(join(ROOT, m[2]))
@@ -277,8 +337,8 @@ if (process.argv.includes("--http")) {
       res.writeHead(401).end();
       return;
     }
-    // Rendered files are downloadable by name: GET /files/<name>.mp4
-    const file = req.url?.match(/^\/files\/([\w.-]+\.mp4)$/)?.[1];
+    // Rendered files are downloadable by name: GET /files/<name>.mp4 (or the stills sheet, <name>.jpg)
+    const file = req.url?.match(/^\/files\/([\w.-]+\.(?:mp4|jpg))$/)?.[1];
     if (req.method === "GET" && file) {
       const f = join(ROOT, "out", basename(file));
       if (!existsSync(f)) {
@@ -286,7 +346,7 @@ if (process.argv.includes("--http")) {
         return;
       }
       res.writeHead(200, {
-        "content-type": "video/mp4",
+        "content-type": file.endsWith(".jpg") ? "image/jpeg" : "video/mp4",
         "content-length": statSync(f).size,
       });
       createReadStream(f).pipe(res);

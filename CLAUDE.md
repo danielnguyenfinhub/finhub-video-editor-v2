@@ -15,7 +15,7 @@ video stack (Remotion + GSAP + shadcn/ui + ElevenLabs/Whisper + FFmpeg by defaul
 3. Duration comes from the spec via `calculateMetadata`, never a hard-coded `durationInFrames`.
 4. Each scene is `src/compositions/PromoVideo/Scene<Name>.tsx`, registered in the `SCENES` map in `Composition.tsx`.
 
-Connector: `mcp/server.ts` (tools check_spec, make_voiceover, build_video, get_job, list_outputs; smoke test `npx tsx mcp/smoke.ts`).
+Connector: `mcp/server.ts` (tools check_spec, make_voiceover, preview_stills, build_video, get_job, list_outputs; smoke test `npx tsx mcp/smoke.ts`).
 
 Quick references (read before writing scene, motion or audio code): `skills/remotion-rules.md`,
 `skills/gsap-motion.md`, `skills/audio-sync.md`.
@@ -27,6 +27,7 @@ Quick references (read before writing scene, motion or audio code): `skills/remo
 | Typecheck | `npm run typecheck` |
 | Voiceover (ElevenLabs) | `npm run voice` (`pipelines/voice.ts`) |
 | Word timestamps (Whisper) | `npm run transcribe` (`pipelines/transcribe.py`, add `--local` for offline) |
+| Stills contact sheet (approval before render) | `npm run stills -- --spec <spec.json> --comp PromoVideo` (`pipelines/stills.ts`) |
 | Render + master + probe + manifest | `npm run build:video -- --spec <spec.json> --comp PromoVideo` (`pipelines/render.ts`) |
 | QA probe only | `python3 skills/render-qa/scripts/probe.py out/<file>.mp4 --spec <spec.json>` |
 
@@ -41,3 +42,6 @@ In cloud sessions set `REMOTION_BROWSER_EXECUTABLE=$(find /opt/pw-browsers -name
 | 2026-10-18 | Studio constructed by the team: guide layout (`app/`, `components/{ui,motion,audio}`, `compositions/PromoVideo`), composition id `Main` → `PromoVideo`, starter spec in `data/templates/` | studio/, agents, skills | User's "AI Video Studio" guide |
 | 2026-10-18 | Remotion project moved from `studio/` to repo root; added `pipelines/{voice.ts,transcribe.py,render.ts}`, `tailwind.config.js` (via `@config`), `data/outputs/`, flat quick-reference skill notes; scenes renamed `Scene*.tsx` | Root, agents, skills | User's exact repo structure |
 | 2026-10-18 | Repo is now a plugin + marketplace (`.claude-plugin/`, `.mcp.json`): skills/agents moved to root `skills/`, `agents/` (`.claude/*` are symlinks); `mcp/server.ts` connector (stdio + `--http` with bearer auth), `mcp/start.mjs` launcher, Dockerfile | Root, skills, mcp | Use in Claude Cowork as a connector with plugin and skills |
+| 2026-10-18 | `check_spec` warns on slideshow risks (repeated UI, no motion intent, text-first scenes, filler words); connector returns `warnings` | skills/video-studio, mcp | Ideas adopted from OpenMontage (AGPL: ideas only, no code copied) |
+| 2026-10-18 | Stills approval gate: `pipelines/stills.ts` (one still per scene at 80% + contact sheet), `preview_stills` connector tool (sheet returned as an image), Workflow stops at `stage: stills` until approved | pipelines, mcp, video-studio, render-engineer | Approve the look before render time is spent (idea from OpenMontage) |
+| 2026-10-18 | Voice provider `fal` (ElevenLabs v3 via `FAL_KEY`) in auto order after ElevenLabs; its word timings replace Whisper when Whisper fails | voice-captions, mcp | Daniel has a working fal key; ElevenLabs key is a key ID and OpenAI is out of credit |

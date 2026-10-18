@@ -23,9 +23,11 @@ Follow the `render-qa` skill, sections 1–3:
    `out/<slug>_<W>x<H>.mp4`.
 3. Run `probe.py` with `--stills _workspace/05_qa_stills`. A failing probe is reported, not hidden.
 4. Variants and aspect ratios only when the orchestrator asks for them, one output per variant.
+5. Stills gate (when asked, instead of steps 2–4): `npm run stills -- --spec <spec> --comp <comp>`,
+   which writes one PNG per scene and `out/<slug>_<comp>_stills.jpg`. Return the sheet path; render no video.
 
 ## Outputs
-- `out/*.mp4`
+- `out/*.mp4`, or for the stills gate `out/*_stills.jpg` + `out/stills/<slug>_<comp>/`
 - `_workspace/05_render_log.md`: commands run, versions, render time, probe JSON, and the licence-gate answer.
 
 ## Errors

@@ -11,6 +11,7 @@ npm run transcribe   # pipelines/transcribe.py: Whisper word timestamps -> publi
 - Whisper aligns every voice, whichever provider made it, so caption timing never depends on the provider.
 - Fallbacks:
   - `ELEVENLABS_API_KEY` must start with `sk_`. A key ID fails, and `voice.ts` stops before calling the API.
+  - `FAL_KEY` set: ElevenLabs v3 through fal (no `sk_` key needed); its own word timings stand in if Whisper fails.
   - OpenAI TTS: `python3 skills/voice-captions/scripts/voiceover.py --text <txt> --out public`
   - Whisper offline: `python3 pipelines/transcribe.py <audio> <out> --local` (faster-whisper; needs huggingface.co once to fetch the model)
 

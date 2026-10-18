@@ -46,6 +46,7 @@
     "studio": "remotion studio src/app/index.ts",
     "render": "remotion render src/app/index.ts",
     "build:video": "tsx pipelines/render.ts",
+    "stills": "tsx pipelines/stills.ts",
     "voice": "tsx pipelines/voice.ts",
     "transcribe": "python3 pipelines/transcribe.py public/voice.mp3 public/words.json",
     "typecheck": "tsc --noEmit",
