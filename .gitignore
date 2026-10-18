@@ -1,0 +1,6 @@
+_workspace/
+_workspace_*/
+out/
+studio/node_modules/
+studio/out/
+__pycache__/
