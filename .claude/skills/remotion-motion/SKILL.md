@@ -17,13 +17,19 @@ render" bugs come from this.
 
 ```
 studio/
-  src/Root.tsx              # registers <Composition id="Main"> with zod schema + calculateMetadata
-  src/Main.tsx              # <Series> of scenes, <Audio> voice, <Captions>
-  src/scenes/<scene-id>.tsx # one file per scene in the spec; the filename is the scene id
-  src/ui/                   # ported shadcn/Magic UI/React Bits components, frame-driven
-  src/lib/brand.ts          # colours, fonts, safe-area constants from spec.meta.brand
-  public/                   # voice.mp3, words.json, images, lottie JSON (via staticFile())
+  src/index.ts                                # registerRoot
+  src/app/Root.tsx                            # registers PromoVideo (+ PromoVideo-9x16) with zod schema + calculateMetadata
+  src/compositions/PromoVideo/Composition.tsx # <Series> of scenes, <Audio> voice, captions, compliance overlay
+  src/compositions/PromoVideo/<scene-id>.tsx  # one file per scene in the spec; the filename is the scene id
+  src/components/ui/                          # shadcn/Magic UI/React Bits components, frame-driven
+  src/components/motion/                      # reusable frame-driven primitives (FadeIn, SlideUp, GsapTimeline)
+  src/components/audio/                       # Captions, waveform
+  src/lib/brand.ts                            # colours, fonts, safe-area constants from spec.meta.brand
+  src/styles/globals.css                      # Tailwind v4 (@remotion/tailwind-v4)
+  public/                                     # voice.mp3, words.json, images, lottie JSON (via staticFile())
+data/templates/video-spec.json                # (repo root) starter spec; copy to _workspace/01_planner_scenes.json
 ```
+Before writing a new primitive, check `components/motion/` and `components/ui/`; reuse beats re-writing.
 
 The composition reads its props from `_workspace/01_planner_scenes.json` (passed with `--props`).
 Duration comes from `calculateMetadata` (sum of scene lengths × fps), never a hard-coded number, so a
@@ -50,7 +56,7 @@ spec change re-times the whole video.
 | Anime.js | `createTimeline({autoplay: false})`, then `.seek(frame / fps * 1000)` in `useLayoutEffect`. |
 | Three.js / R3F | Wrap in `<ThreeCanvas>` from `@remotion/three`; derive rotation/camera from `frame`; no `useFrame`. Dispose geometries/materials in cleanup so a long render does not leak GPU memory. |
 | Lottie | `<Lottie animationData={...}>` from `@remotion/lottie`; load the JSON with `staticFile` + `delayRender`. |
-| React Bits / Magic UI | Copy the source into `src/ui/`, delete its `@keyframes`/`transition` CSS, and re-drive the same properties from `frame`. |
+| React Bits / Magic UI | Copy the source into `src/components/ui/`, delete its `@keyframes`/`transition` CSS, and re-drive the same properties from `frame`. |
 | Manim / Motion Canvas / Revideo clip | Render separately to MP4 and place it with `<OffthreadVideo src={staticFile(...)}>`. |
 
 ## Assets, fonts, async
@@ -73,7 +79,7 @@ spec change re-times the whole video.
 
 Read `public/words.json` (`[{word, start, end}]` in seconds). Group the words into pages of at most 7
 words, or break at sentence punctuation. Highlight the word where `start ≤ t < end`. Render captions in
-`Main.tsx` above all scenes so scene changes never cut a caption off.
+`Composition.tsx` (via `components/audio/Captions`) above all scenes so scene changes never cut a caption off.
 
 ## Compliance overlay (finance content)
 

@@ -19,7 +19,7 @@ You own the toolchain: the studio scaffold, the render, the master, and the firs
 Follow the `render-qa` skill, sections 1–3:
 1. Scaffold if `studio/package.json` is missing; pin all `@remotion/*` versions to one exact version.
    Check the Remotion licence gate from `video-stack` and record the answer in the log.
-2. Render `Main` with `--props` set to the spec, then master with loudnorm at TP −2 into
+2. Render `PromoVideo` with `--props` set to the spec, then master with loudnorm at TP −2 into
    `out/<slug>_<W>x<H>.mp4`.
 3. Run `probe.py` with `--stills _workspace/05_qa_stills`. A failing probe is reported, not hidden.
 4. Variants and aspect ratios only when the orchestrator asks for them, one output per variant.

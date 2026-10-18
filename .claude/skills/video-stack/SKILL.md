@@ -25,7 +25,7 @@ engine adds a bundle, a timing model to reconcile with Remotion's frame clock, a
 | --- | --- | --- |
 | 3D object, camera move, product spin | React Three Fiber (+ three) via `@remotion/three` | Never run R3F's own `useFrame` clock; derive from `useCurrentFrame()` |
 | Designer supplied an After Effects/Bodymovin JSON | Lottie via `@remotion/lottie` | Do not hand-recreate an existing Lottie |
-| Hero text effect, animated background | React Bits / Magic UI component copied into `studio/src/ui/` | Copy the source; strip CSS keyframes and re-drive from frame |
+| Hero text effect, animated background | React Bits / Magic UI component copied into `studio/src/components/ui/` | Copy the source; strip CSS keyframes and re-drive from frame |
 | Toolbar morph, cursor-driven app demo | Motion Primitives / Motion | Replace time-based transitions with frame-based values |
 | SVG path draw, stagger grids | Anime.js or GSAP | Prefer GSAP if it is already in the bundle |
 | Maths/algorithm explainer | Manim (Python) rendered to MP4, imported as `<OffthreadVideo>` | Separate render, then composite |

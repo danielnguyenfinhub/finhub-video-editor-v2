@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "slug": "receptionai-salon-promo",
+    "title": "ReceptionAI: AI Receptionist for Nail Salons",
+    "brandName": "ReceptionAI",
+    "tagline": "Never miss another salon appointment.",
+    "language": "en-AU",
+    "fps": 30, "width": 1920, "height": 1080,
+    "brand": {"primary": "#4f46e5", "accent": "#F472B6", "font": "Inter", "logo": "public/logo.svg"},
+    "audience": "US nail-salon owners, 1–3 locations",
+    "cta": {"text": "Start free at example.com", "url": "https://example.com"},
+    "voice": {"provider": "auto", "voiceId": null},
+    "compliance": null
+  },
+  "scenes": [
+    {
+      "id": "s01-problem",
+      "startSec": 0, "endSec": 12,
+      "goal": "Owner feels the cost of missed calls",
+      "voiceover": "Every missed call during peak hour is a booking walking out the door. Your hands are busy, and the phone keeps ringing.",
+      "onScreenText": ["Missed call", "3 bookings lost today"],
+      "visual": "Busy salon counter; phone toast stacking unanswered",
+      "ui": ["IncomingCallToast"],
+      "motion": "Toasts stack with spring, counter ticks up on the word 'booking'",
+      "libs": ["gsap"],
+      "sfx": [{"cue": "ring", "atWord": "missed"}],
+      "notes": ""
+    },
+    {
+      "id": "s02-solution",
+      "startSec": 12, "endSec": 30,
+      "goal": "Introduce ReceptionAI as the always-on receptionist",
+      "voiceover": "Meet ReceptionAI. It answers every call, day or night, in a friendly voice. It knows your services, your prices and your opening hours.",
+      "onScreenText": ["ReceptionAI", "Answers every call, 24/7"],
+      "visual": "Phone toast flips to a green answered state; waveform pulses with the AI voice",
+      "ui": ["AnsweredCallCard", "VoiceWaveform"],
+      "motion": "Card morphs from missed to answered; waveform driven by the voiceover",
+      "libs": [],
+      "sfx": [{"cue": "chime", "atWord": "Meet"}],
+      "notes": ""
+    },
+    {
+      "id": "s03-booking",
+      "startSec": 30, "endSec": 48,
+      "goal": "Show the booking landing in the calendar with no staff effort",
+      "voiceover": "Callers book, change or cancel appointments while you stay focused on the client in your chair. Every booking lands straight in your calendar.",
+      "onScreenText": ["Booked: Gel manicure, 2:30 pm", "Added to your calendar"],
+      "visual": "Calendar view; a new appointment block slides into an open slot",
+      "ui": ["BookingCalendar", "AppointmentBlock"],
+      "motion": "Appointment block slides in with spring; confirmation tick draws on",
+      "libs": [],
+      "sfx": [{"cue": "tick", "atWord": "calendar"}],
+      "notes": ""
+    },
+    {
+      "id": "s04-outro",
+      "startSec": 48, "endSec": 60,
+      "goal": "Close on the brand, tagline and call to action",
+      "voiceover": "ReceptionAI. Never miss another salon appointment. Start your free trial today.",
+      "onScreenText": ["ReceptionAI", "Never miss another salon appointment.", "Start free at example.com"],
+      "visual": "Brand-colour background, logo and tagline centred, CTA button below",
+      "ui": ["CtaButton"],
+      "motion": "Logo scales in, tagline fades up, CTA pulses once",
+      "libs": [],
+      "sfx": [],
+      "notes": ""
+    }
+  ],
+  "variants": [
+    {"id": "glamour-nails", "meta": {"brand": {"accent": "#A855F7"}, "cta": {"text": "glamour.example.com"}}}
+  ]
+}

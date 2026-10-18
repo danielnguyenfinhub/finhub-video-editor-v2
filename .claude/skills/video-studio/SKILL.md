@@ -22,9 +22,9 @@ names below), launching UI and Audio in one message.
 | Agent (`agentType`) | Model | Skill(s) | Writes |
 | --- | --- | --- | --- |
 | video-planner | opus | video-stack | `_workspace/01_planner_*` |
-| ui-asset-builder | opus | remotion-motion, video-stack | `studio/src/ui`, `_workspace/02_ui_manifest.md` |
+| ui-asset-builder | opus | remotion-motion, video-stack | `studio/src/components/ui`, `_workspace/02_ui_manifest.md` |
 | audio-engineer | sonnet | voice-captions | `studio/public/voice*`, `words.json`, `_workspace/03_audio_report.md` |
-| motion-designer | opus | remotion-motion | `studio/src/{Root,Main}.tsx`, `scenes/`, `_workspace/04_motion_notes.md` |
+| motion-designer | opus | remotion-motion | `studio/src/app/Root.tsx`, `studio/src/compositions/`, `_workspace/04_motion_notes.md` |
 | render-engineer | sonnet | render-qa, video-stack | `studio/` scaffold, `out/*.mp4`, `_workspace/05_render_log.md` |
 | video-qa | opus | render-qa | QA report (returned; saved to `_workspace/05_qa_report.json`) |
 
@@ -92,7 +92,7 @@ const built = await parallel([
 note('ui-asset-builder', built[0]); note('audio-engineer', built[1])
 
 phase('Motion')
-const motion = await agent('Write Root, Main and every scene. Use provisional timing if words.json is missing.',
+const motion = await agent('Write Root, the PromoVideo composition and every scene. Use provisional timing if words.json is missing.',
   { agentType: 'motion-designer', phase: 'Motion', schema: STEP })
 note('motion-designer', motion)
 if (!motion || !motion.ok) return { stage: 'motion', motion, blocked, openQuestions: plan.openQuestions }

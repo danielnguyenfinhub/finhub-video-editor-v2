@@ -43,7 +43,7 @@
 | --- | --- |
 | Scenes are contiguous: `scenes[i].endSec == scenes[i+1].startSec`, first starts at 0 | `calculateMetadata` sums them; gaps become black frames |
 | `words(voiceover) ≤ 2.5 × (endSec − startSec)` | ~150 wpm is the ceiling for clear TTS; beyond it the voice rushes or overruns |
-| Scene ids are kebab-case, prefixed `sNN-` | They become filenames (`src/scenes/<id>.tsx`, stills) |
+| Scene ids are kebab-case, prefixed `sNN-` | They become filenames (`src/compositions/PromoVideo/<id>.tsx`, stills) |
 | `libs` only lists libraries the scene actually needs, from video-stack | Every extra engine is bundle weight and a timing model to bridge |
 | `ui` names real components (shadcn/Magic UI names or new PascalCase ones) | ui-asset-builder builds exactly this list |
 | `compliance` set whenever the video mentions credit, rates, loans or savings | Triggers the disclaimer overlay and blocking QA rules |

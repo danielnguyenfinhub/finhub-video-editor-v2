@@ -11,7 +11,8 @@ description: "Scaffolds the Remotion studio, renders the composition, masters au
 npx --yes create-video@latest --yes --blank --tailwind studio   # --yes is required: without it the CLI waits on an interactive prompt
 cd studio && npm i && npm i zod @remotion/zod-types @remotion/google-fonts @remotion/media-utils   # plus what the spec's libs need
 ```
-The blank template registers `MyComp`; rename it to `Main` in `src/Root.tsx`.
+The studio is already scaffolded in this repo (entry `src/index.ts`, registry `src/app/Root.tsx`); only
+re-run this section if `studio/package.json` is gone.
 
 Remotion downloads its own headless Chrome from `remotion.media` on first render. Where that host is blocked
 (cloud sessions), add `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`
@@ -24,14 +25,14 @@ confirm the Remotion licence (see video-stack); if no licence is held, stop and 
 
 ```bash
 cd studio
-npx remotion render Main ../out/raw.mp4 --props=../_workspace/01_planner_scenes.json --codec=h264 --concurrency=50%
+npx remotion render src/index.ts PromoVideo ../out/raw.mp4 --props=../_workspace/01_planner_scenes.json --codec=h264 --concurrency=50%
 ffmpeg -y -i ../out/raw.mp4 -c:v copy -af "loudnorm=I=-14:TP=-2:LRA=11" -ar 48000 -c:a aac -b:a 192k \
   -movflags +faststart ../out/<slug>_<WxH>.mp4
 ```
 - **TP −2, not −1:** AAC encoding adds roughly 0.5–1 dB of overshoot. Mastering at −1.5 measured
   −0.89 dBTP after encoding in testing, which fails the −1.0 ceiling.
 - −14 LUFS suits YouTube/Meta/LinkedIn. For broadcast, pass `--target-lufs -23` to the probe and master at `I=-23`.
-- Other aspect ratios: render a separate composition (`Main-9x16`) from the same spec, not a crop, so
+- Other aspect ratios: render a separate composition (`PromoVideo-9x16`) from the same spec, not a crop, so
   text reflows inside the safe areas.
 - Batch variants: loop over `spec.variants`, merging each into the props, and render to
   `out/<slug>_<variantId>.mp4`. Probe each output; one failed variant does not block the others.
