@@ -18,7 +18,7 @@ in the video is the UI a customer would see.
 ## Work
 1. Follow the `remotion-motion` skill (frame-driven rule, layout, legibility) and `video-stack` (sources).
 2. Write `studio/src/lib/brand.ts` from `meta.brand` (colours, font loader, `SAFE` margins).
-3. For each UI component, put one file in `studio/src/ui/<Name>.tsx`. Source order: shadcn/ui
+3. For each UI component, put one file in `studio/src/components/ui/<Name>.tsx`. Source order: shadcn/ui
    (`npx shadcn@latest add`), then Magic UI, then React Bits / Motion Primitives (copy source), then write
    from scratch. Strip every CSS keyframe/transition and expose animatable values as props (for example
    `progress: number` 0–1) so motion-designer drives them from the frame.
@@ -28,7 +28,7 @@ in the video is the UI a customer would see.
 6. Type-check: `cd studio && npx tsc --noEmit`.
 
 ## Outputs
-- `studio/src/ui/*.tsx`, `studio/src/lib/brand.ts`, `studio/public/*` assets.
+- `studio/src/components/ui/*.tsx`, `studio/src/lib/brand.ts`, `studio/public/*` assets.
 - `_workspace/02_ui_manifest.md`: each component, its source library and licence, and its animatable props.
 
 ## Errors
