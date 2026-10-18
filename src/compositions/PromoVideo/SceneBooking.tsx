@@ -6,12 +6,15 @@ import {beatFrame, SlideUp, useRamp, useSpringAt} from '../../components/motion'
 import {COLORS, fontFamily} from '../../lib/brand';
 import {PORTRAIT_BOX, PORTRAIT_ZOOM, Stage, usePortrait, type SceneProps} from './shared';
 
-// Portrait: Sophie's column only, so the new booking's name and details fit untruncated at 864 wide.
+// Portrait: Sophie's column only, 12–5 pm and a short date, so the new booking's name and details fit
+// untruncated at 864 wide and the calendar plus both pills fit above the captions.
 const SOPHIE = SALON_SATURDAY.incoming!.stylist;
 const PORTRAIT_DATA = {
 	...SALON_SATURDAY,
+	dateLabel: 'Saturday, 24 Oct',
+	startHour: 12,
 	stylists: [SALON_SATURDAY.stylists![SOPHIE]],
-	appointments: SALON_SATURDAY.appointments!.filter((a) => a.stylist === SOPHIE).map((a) => ({...a, stylist: 0})),
+	appointments: SALON_SATURDAY.appointments!.filter((a) => a.stylist === SOPHIE && a.start >= 12).map((a) => ({...a, stylist: 0})),
 	incoming: {...SALON_SATURDAY.incoming!, stylist: 0},
 };
 // Landscape: 12–5 pm keeps the calendar plus the confirmation row inside the safe box.
@@ -62,7 +65,7 @@ export const SceneBooking: React.FC<SceneProps> = ({scene, words}) => {
 	return (
 		// Landscape h 960 (was 900): content is ~916 tall, so 900 pushed the top pill above the 54px safe line.
 		<Stage w={portrait ? PORTRAIT_BOX.w : 1560} h={portrait ? PORTRAIT_BOX.h : 960} background={COLORS.canvas}>
-			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: portrait ? 40 : 28, fontFamily}}>
+			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: portrait ? 32 : 28, fontFamily}}>
 				<div
 					style={{
 						display: 'flex',

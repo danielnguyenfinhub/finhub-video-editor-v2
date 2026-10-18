@@ -62,7 +62,7 @@ export const SceneProblem: React.FC<SceneProps> = ({scene, words}) => {
 	// Portrait: 750-wide toasts zoomed 1.15 fill the 864 safe width.
 	const stackW = portrait ? PORTRAIT_BOX.w / PORTRAIT_ZOOM : 880;
 	const stackH = ROW * 2 + 200;
-	const counterSize = portrait ? 260 : 240;
+	const counterSize = portrait ? 220 : 240;
 
 	return (
 		<Stage w={portrait ? PORTRAIT_BOX.w : 1728} h={portrait ? PORTRAIT_BOX.h : 860} background={COLORS.canvas}>
@@ -71,7 +71,7 @@ export const SceneProblem: React.FC<SceneProps> = ({scene, words}) => {
 					display: 'flex',
 					flexDirection: portrait ? 'column' : 'row',
 					alignItems: 'center',
-					gap: portrait ? 72 : 96,
+					gap: portrait ? 48 : 96,
 					fontFamily,
 				}}
 			>

@@ -43,7 +43,7 @@ export const SceneOutro: React.FC<SceneProps> = ({scene, meta, words}) => {
 						{/* Mark cropped from logo.svg (x 0–128 of 720); the wordmark is live Inter text, so the card hugs it
 						    instead of the SVG's fallback-font text leaving blank space on the right. */}
 						<div style={{width: 128, height: 160, overflow: 'hidden', flexShrink: 0}}>
-							<Img src={staticFile(logo)} style={{width: 720, display: 'block'}} alt="" />
+							<Img src={staticFile(logo)} style={{width: 720, maxWidth: 'none', display: 'block'}} alt="" />
 						</div>
 						<span
 							style={{fontSize: 84, fontWeight: 800, letterSpacing: -2, lineHeight: 1, color: meta.brand.primary, whiteSpace: 'nowrap'}}

@@ -17,8 +17,9 @@ guessing, so be concrete: exact on-screen words, exact UI component names, the w
   addressed to `video-planner`. Change only what the feedback touches.
 
 ## Work
-1. Read `.claude/skills/video-studio/references/scene-spec.md` for the schema and rules, and the
-   `video-stack` skill for library choices.
+1. Read `.claude/skills/video-studio/references/scene-spec.md` for the schema and rules,
+   `.claude/skills/video-studio/references/owner-profile.md` for Daniel's defaults (bilingual vi+en,
+   brand, font, voice, no stored contact details), and the `video-stack` skill for library choices.
 2. Outline the story first: hook (≤ 3 s), problem, solution, proof, CTA. Then split it into scenes of
    5–15 s each.
 3. Write the voiceover at no more than 2.5 words per second of scene time. Australian English unless
