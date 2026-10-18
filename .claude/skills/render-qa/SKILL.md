@@ -26,9 +26,15 @@ confirm the Remotion licence (see video-stack); if no licence is held, stop and 
 ```bash
 cd studio
 npx remotion render src/index.ts PromoVideo ../out/raw.mp4 --props=../_workspace/01_planner_scenes.json --codec=h264 --concurrency=50%
-ffmpeg -y -i ../out/raw.mp4 -c:v copy -af "loudnorm=I=-14:TP=-2:LRA=11" -ar 48000 -c:a aac -b:a 192k \
-  -movflags +faststart ../out/<slug>_<WxH>.mp4
+ffmpeg -y -i ../out/raw.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" -c:v libx264 -crf 17 \
+  -af "loudnorm=I=-14:TP=-2:LRA=11" -ar 48000 -c:a aac -b:a 192k -movflags +faststart ../out/<slug>_<WxH>.mp4
 ```
+- **Re-encode video, don't `-c:v copy`:** Remotion's H.264 is full-range `yuvj420p` (even with
+  `--pixel-format=yuv420p`, tested on 4.0.536), which some players show washed out. Converting to TV range
+  `yuv420p` here is what makes the probe's `video_codec` check pass.
+- **No voice yet:** if `raw.mp4` has no audio stream, swap `-af …` for a silent track
+  (`-f lavfi -i anullsrc=r=48000:cl=stereo -shortest`). The probe then fails `loudness` and
+  `no_long_silence`; report those as **blocked: voice**, not as passes.
 - **TP −2, not −1:** AAC encoding adds roughly 0.5–1 dB of overshoot. Mastering at −1.5 measured
   −0.89 dBTP after encoding in testing, which fails the −1.0 ceiling.
 - −14 LUFS suits YouTube/Meta/LinkedIn. For broadcast, pass `--target-lufs -23` to the probe and master at `I=-23`.
