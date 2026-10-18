@@ -1,6 +1,6 @@
 # Audio sync: subtitle and voice alignment
 
-Quick reference. The full procedure is in `.claude/skills/voice-captions/SKILL.md`.
+Quick reference. The full procedure is in `skills/voice-captions/SKILL.md`.
 
 ## Pipeline
 ```bash
@@ -11,7 +11,7 @@ npm run transcribe   # pipelines/transcribe.py: Whisper word timestamps -> publi
 - Whisper aligns every voice, whichever provider made it, so caption timing never depends on the provider.
 - Fallbacks:
   - `ELEVENLABS_API_KEY` must start with `sk_`. A key ID fails, and `voice.ts` stops before calling the API.
-  - OpenAI TTS: `python3 .claude/skills/voice-captions/scripts/voiceover.py --text <txt> --out public`
+  - OpenAI TTS: `python3 skills/voice-captions/scripts/voiceover.py --text <txt> --out public`
   - Whisper offline: `python3 pipelines/transcribe.py <audio> <out> --local` (faster-whisper; needs huggingface.co once to fetch the model)
 
 ## Rules

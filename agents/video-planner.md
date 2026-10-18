@@ -17,8 +17,8 @@ guessing, so be concrete: exact on-screen words, exact UI component names, the w
   addressed to `video-planner`. Change only what the feedback touches.
 
 ## Work
-1. Read `.claude/skills/video-studio/references/scene-spec.md` for the schema and rules,
-   `.claude/skills/video-studio/references/owner-profile.md` for Daniel's defaults (bilingual vi+en,
+1. Read `skills/video-studio/references/scene-spec.md` for the schema and rules,
+   `skills/video-studio/references/owner-profile.md` for Daniel's defaults (bilingual vi+en,
    brand, font, voice, no stored contact details), and the `video-stack` skill for library choices.
 2. Outline the story first: hook (≤ 3 s), problem, solution, proof, CTA. Then split it into scenes of
    5–15 s each.
@@ -28,7 +28,7 @@ guessing, so be concrete: exact on-screen words, exact UI component names, the w
 5. Credit, rates, loans or savings content: set `meta.compliance`. Use only the disclaimer text the user
    supplied; otherwise write `"MISSING"`. Never invent a rate, saving or approval claim; every figure must
    come from the brief.
-6. Validate: `python3 .claude/skills/video-studio/scripts/check_spec.py _workspace/01_planner_scenes.json`.
+6. Validate: `python3 skills/video-studio/scripts/check_spec.py _workspace/01_planner_scenes.json`.
    Fix every problem except a MISSING disclaimer, which only the user can resolve.
 
 ## Outputs

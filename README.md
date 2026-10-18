@@ -8,8 +8,8 @@ Ask Claude Code in this repo, for example: *"Make a 60 s 16:9 promo for X, CTA e
 your approval. Nothing is published without explicit confirmation.
 
 ```
-.claude/agents/            video-planner, ui-asset-builder, audio-engineer, motion-designer, render-engineer, video-qa
-.claude/skills/            video-studio, video-stack, remotion-motion, voice-captions, render-qa (folder skills)
+agents/            video-planner, ui-asset-builder, audio-engineer, motion-designer, render-engineer, video-qa
+skills/            video-studio, video-stack, remotion-motion, voice-captions, render-qa (folder skills)
                            remotion-rules.md, gsap-motion.md, audio-sync.md (quick references)
 CLAUDE.md                  rules + commands
 data/templates/            video-spec.json (starter scene spec)
@@ -21,6 +21,36 @@ src/compositions/PromoVideo/  Composition.tsx · SceneProblem · SceneSolution �
 src/styles/globals.css     Tailwind v4 (+ tailwind.config.js via @config)
 public/                    fonts, logo, voice.mp3, words.json
 ```
+
+## Install as a plugin (Cowork or Claude Code)
+
+The repo is a plugin (`.claude-plugin/`) and its own marketplace. It brings the six agents, the skills and
+the **finhub-video-studio connector**, an MCP server with `check_spec`, `make_voiceover`, `build_video`,
+`get_job` and `list_outputs`.
+
+- **Claude Code:** `/plugin marketplace add danielnguyenfinhub/finhub-video-editor-v2`, then
+  `/plugin install finhub-video-studio@finhub-video`
+- **Cowork:** add the same marketplace in Settings → Plugins (or upload the packaged `.plugin` file), then enable
+  `finhub-video-studio`.
+- **First run:** the connector runs `npm ci` once inside the plugin folder (about 1–2 minutes), then
+  starts. The machine needs Node 20+, Python 3 with `requests`, and FFmpeg on the PATH.
+- **API keys:** desktop apps don't see your shell variables, so put keys in a `.env` file in the studio folder:
+  `GEMINI_API_KEY=…` (Charon voice), optionally `ELEVENLABS_API_KEY=sk_…` and `OPENAI_API_KEY=…`.
+  To use your own clone instead of the plugin copy, set `STUDIO_DIR=/path/to/clone`.
+
+## Hosted connector (any device, e.g. Railway)
+
+The same server runs over HTTP: `npx tsx mcp/server.ts --http`, or `docker build .` with the included Dockerfile.
+- **Variables:** `MCP_AUTH_TOKEN` (required; long random string), `PORT`, and the voice keys.
+- **Connecting Cowork:** add a custom connector with URL `https://<host>/mcp` and header
+  `Authorization: Bearer <MCP_AUTH_TOKEN>`.
+- **Downloads:** finished MP4s are at `GET /files/<name>.mp4`, with the same header.
+- **Costs:** renders take 2–3 minutes of CPU each, and hosting costs money.
+- **Status:** the Dockerfile has not yet been build-tested.
+
+Check the connector locally: `npx tsx mcp/smoke.ts`.
+
+## Run locally
 
 ```bash
 npm ci

@@ -1,6 +1,6 @@
 # Remotion rules: frame timing and hooks
 
-Quick reference. The full rules are in `.claude/skills/remotion-motion/SKILL.md`.
+Quick reference. The full rules are in `skills/remotion-motion/SKILL.md`.
 
 ## Time comes from the frame, never the clock
 Remotion renders frames out of order and in parallel tabs, so anything with its own clock breaks in the MP4.

@@ -18,7 +18,7 @@ provider-specific alignment format.
    with the over-length scenes. Do not speed the voice up to make it fit; rushed TTS sounds synthetic.
 3. Generate and align:
    ```bash
-   python3 .claude/skills/voice-captions/scripts/voiceover.py \
+   python3 skills/voice-captions/scripts/voiceover.py \
      --text _workspace/03_audio_script.txt --out public [--voice <id>] [--local]
    ```
    The script prints `{provider, duration, words, wordsPerSec, scriptMatch}` and writes
