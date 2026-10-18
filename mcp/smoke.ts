@@ -38,12 +38,11 @@ const main = async () => {
       },
     ],
   };
-  assert.equal(
-    body(
-      await client.callTool({ name: "check_spec", arguments: { spec: bad } }),
-    ).ok,
-    false,
+  const badBody = body(
+    await client.callTool({ name: "check_spec", arguments: { spec: bad } }),
   );
+  assert.equal(badBody.ok, false);
+  assert.ok(badBody.warnings.some((w: string) => w.includes("motion intent")));
   const escape = await client.callTool({
     name: "check_spec",
     arguments: { specPath: "../../etc/passwd" },

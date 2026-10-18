@@ -28,7 +28,7 @@ guessing, so be concrete: exact on-screen words, exact UI component names, the w
 5. Credit, rates, loans or savings content: set `meta.compliance`. Use only the disclaimer text the user
    supplied; otherwise write `"MISSING"`. Never invent a rate, saving or approval claim; every figure must
    come from the brief.
-6. Validate: `python3 skills/video-studio/scripts/check_spec.py _workspace/01_planner_scenes.json`.
+6. Validate: `python3 skills/video-studio/scripts/check_spec.py _workspace/01_planner_scenes.json`. Fix every problem; fix `warn:` lines (slideshow risks) unless the brief asks for that choice, and say which you kept.
    Fix every problem except a MISSING disclaimer, which only the user can resolve.
 
 ## Outputs

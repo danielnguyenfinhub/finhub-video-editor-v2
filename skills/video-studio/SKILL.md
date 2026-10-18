@@ -13,7 +13,7 @@ in the working folder:
 
 | Step | Tool |
 | --- | --- |
-| Validate the spec (always first; free) | `check_spec` (pass `spec` inline or `specPath`) |
+| Validate the spec (always first; free) | `check_spec` (pass `spec` inline or `specPath`); fix `problems`, and fix or justify `warnings` |
 | Voice + word timings (spends credits) | `make_voiceover` |
 | Render, master, probe (2–3 min) | `build_video`, then poll `get_job` until `done`/`failed` |
 | Show finished videos and their QA | `list_outputs` |

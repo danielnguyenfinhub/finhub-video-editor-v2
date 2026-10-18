@@ -44130,7 +44130,7 @@ var build = () => {
     "check_spec",
     {
       title: "Validate a scene spec",
-      description: "Check a scene spec before spending credits: contiguous scenes, \u22642.5 words/sec voiceover pace, sNN-kebab ids, and credit/rate language without a compliance disclaimer.",
+      description: "Check a scene spec before spending credits: contiguous scenes, \u22642.5 words/sec voiceover pace, sNN-kebab ids, and credit/rate language without a compliance disclaimer (problems). Also flags slideshow risks: repeated UI, missing motion intent, text-first scenes, filler words (warnings).",
       inputSchema: SpecInput
     },
     async (a) => {
@@ -44138,9 +44138,11 @@ var build = () => {
         "skills/video-studio/scripts/check_spec.py",
         specFile(a)
       ]);
+      const lines = r.out.split("\n").filter((l) => l && l !== "spec ok");
       return text({
         ok: r.code === 0,
-        problems: r.code === 0 ? [] : r.out.split("\n")
+        problems: lines.filter((l) => !l.startsWith("warn: ")),
+        warnings: lines.filter((l) => l.startsWith("warn: ")).map((l) => l.slice(6))
       });
     }
   );
