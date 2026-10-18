@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Voiceover + word timings for the video studio.
 
-  voiceover.py --text script.txt --out public [--voice ID] [--provider auto|elevenlabs|openai]
+  voiceover.py --text script.txt --out public [--voice ID] [--provider auto|gemini|elevenlabs|openai]
   voiceover.py --audio existing.mp3 --text script.txt --out public   # align only
   add --local to align with faster-whisper on this machine (no API credits needed)
   voiceover.py --selftest
@@ -9,10 +9,11 @@
 Writes <out>/voice.mp3, <out>/words.json ([{word,start,end}] seconds) and <out>/voice.json (meta).
 Whisper is the single timing source for every provider, so captions behave the same whatever voiced them.
 """
-import argparse, difflib, json, os, re, shutil, sys
+import argparse, base64, difflib, json, math, os, re, shutil, struct, subprocess, sys, tempfile
 import requests
 
 EL_URL = "https://api.elevenlabs.io/v1/text-to-speech/{voice}?output_format=mp3_44100_128"
+GEM_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 OA_TTS = "https://api.openai.com/v1/audio/speech"
 OA_STT = "https://api.openai.com/v1/audio/transcriptions"
 
@@ -26,29 +27,74 @@ def match_ratio(script, words):
     return round(difflib.SequenceMatcher(None, norm(script), norm(" ".join(w["word"] for w in words))).ratio(), 3)
 
 
-def pick_provider(choice):
+class Fail(Exception):
+    """A provider could not produce audio (auth, quota, no audio). Auto mode moves on; explicit mode exits."""
+
+
+def pick_provider(choice, env=os.environ):
+    """Ordered provider list. auto = gemini (key set) -> elevenlabs (sk_ key; a key ID authenticates nothing) -> openai."""
     if choice != "auto":
-        return choice
-    # A key ID (no sk_ prefix) authenticates nothing, so fall through to OpenAI instead of failing late.
-    return "elevenlabs" if os.environ.get("ELEVENLABS_API_KEY", "").startswith("sk_") else "openai"
+        return [choice]
+    return ([p for p, ok in (("gemini", env.get("GEMINI_API_KEY")),
+                             ("elevenlabs", env.get("ELEVENLABS_API_KEY", "").startswith("sk_"))) if ok]
+            + ["openai"])
+
+
+def pcm_to_mp3(pcm, dest):
+    """Raw 24 kHz 16-bit mono PCM -> mp3."""
+    r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "s16le", "-ar", "24000", "-ac", "1",
+                        "-i", "pipe:0", "-codec:a", "libmp3lame", "-b:a", "128k", dest],
+                       input=pcm, capture_output=True)
+    if r.returncode:
+        raise Fail(f"ffmpeg failed: {r.stderr.decode()[:200]}")
+
+
+def gemini_tts(text, voice, dest):
+    voice = voice or os.environ.get("GEMINI_VOICE") or "Charon"
+    models = [os.environ["GEMINI_TTS_MODEL"]] if os.environ.get("GEMINI_TTS_MODEL") else \
+        ["gemini-2.5-pro-preview-tts", "gemini-2.5-flash-preview-tts"]
+    body = {"contents": [{"parts": [{"text": text}]}],
+            "generationConfig": {"responseModalities": ["AUDIO"], "speechConfig": {
+                "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}}}}
+    why = "no models"
+    for i, model in enumerate(models):
+        for _ in range(3):  # preview models sometimes return 200 with no audio: 1 try + 2 retries
+            r = requests.post(GEM_URL.format(model=model), timeout=300, json=body,
+                              headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]})
+            if r.status_code in (401, 403):
+                raise Fail(f"gemini auth {r.status_code}: {r.text[:200]}")
+            if r.status_code == 429:
+                why = f"{model} quota 429"
+                break  # next model; on the last one we fall out and fail
+            if r.status_code != 200:
+                raise Fail(f"gemini {model} {r.status_code}: {r.text[:200]}")
+            parts = ((r.json().get("candidates") or [{}])[0].get("content") or {}).get("parts") or []
+            pcm = b"".join(base64.b64decode(p["inlineData"]["data"]) for p in parts if p.get("inlineData"))
+            if pcm:
+                return pcm_to_mp3(pcm, dest)
+            why = f"{model} returned no audio"
+    raise Fail(f"gemini: {why}")
 
 
 def tts(provider, text, voice, dest):
+    if provider == "gemini":
+        return gemini_tts(text, voice, dest)
     if provider == "elevenlabs":
         if not voice:
-            sys.exit("ElevenLabs needs --voice <voice_id> (list voices in the ElevenLabs app or MCP).")
+            raise Fail("ElevenLabs needs --voice <voice_id> (list voices in the ElevenLabs app or MCP).")
+        # eleven_v3 for Vietnamese: multilingual_v2 doesn't speak it well
         r = requests.post(EL_URL.format(voice=voice), timeout=300,
                           headers={"xi-api-key": os.environ["ELEVENLABS_API_KEY"]},
-                          json={"text": text, "model_id": "eleven_multilingual_v2"})
+                          json={"text": text, "model_id": os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")})
     else:
         if len(text) > 4096:
-            sys.exit(f"OpenAI TTS takes 4096 chars max; script is {len(text)}. Split by scene.")
+            raise Fail(f"OpenAI TTS takes 4096 chars max; script is {len(text)}. Split by scene.")
         r = requests.post(OA_TTS, timeout=300,
                           headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}"},
                           json={"model": "gpt-4o-mini-tts", "voice": voice or "alloy", "input": text,
                                 "response_format": "mp3"})
     if r.status_code != 200:
-        sys.exit(f"{provider} TTS failed {r.status_code}: {r.text[:300]}")
+        raise Fail(f"{provider} TTS failed {r.status_code}: {r.text[:300]}")
     with open(dest, "wb") as f:
         f.write(r.content)
 
@@ -76,7 +122,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--text"); ap.add_argument("--audio"); ap.add_argument("--out")
     ap.add_argument("--voice"); ap.add_argument("--provider", default="auto",
-                                                choices=["auto", "elevenlabs", "openai"])
+                                                choices=["auto", "gemini", "elevenlabs", "openai"])
     ap.add_argument("--local", action="store_true", help="align with local faster-whisper instead of the API")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
@@ -84,24 +130,46 @@ def main():
         w = [{"word": x} for x in "Calls go unanswered at peak hour".split()]
         assert match_ratio("Calls go unanswered at peak hour.", w) == 1.0
         assert match_ratio("Calls go unanswered at peak hour.", w[:3]) < 0.9
-        assert pick_provider("openai") == "openai"
+        assert pick_provider("openai") == ["openai"]
+        assert pick_provider("auto", {"GEMINI_API_KEY": "g", "ELEVENLABS_API_KEY": "sk_x"}) == ["gemini", "elevenlabs", "openai"]
+        assert pick_provider("auto", {"ELEVENLABS_API_KEY": "sk_x"}) == ["elevenlabs", "openai"]
+        assert pick_provider("auto", {"ELEVENLABS_API_KEY": "keyid"}) == ["openai"]
+        pcm = b"".join(struct.pack("<h", int(8000 * math.sin(2 * math.pi * 440 * i / 24000))) for i in range(12000))
+        with tempfile.TemporaryDirectory() as d:
+            mp3 = os.path.join(d, "t.mp3"); pcm_to_mp3(pcm, mp3)
+            dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                                                 "-of", "csv=p=0", mp3]))
+            assert 0.4 < dur < 0.7, dur
         print("selftest ok"); return
     if not (a.text and a.out):
         ap.error("--text and --out are required")
     os.makedirs(a.out, exist_ok=True)
     script = open(a.text, encoding="utf-8").read().strip()
     voice = os.path.join(a.out, "voice.mp3")
-    provider = "supplied"
+    provider, tried = "supplied", []
     if a.audio:
         if os.path.abspath(a.audio) != os.path.abspath(voice):
             shutil.copyfile(a.audio, voice)
     else:
-        provider = pick_provider(a.provider)
-        tts(provider, script, a.voice, voice)
+        order = pick_provider(a.provider)
+        if a.provider == "auto":
+            tried += [{"provider": p, "error": "skipped: " + why} for p, why in (
+                ("gemini", "GEMINI_API_KEY not set"), ("elevenlabs", "ELEVENLABS_API_KEY missing or not an sk_ key"))
+                if p not in order]
+        for provider in order:
+            try:
+                tts(provider, script, a.voice, voice); break
+            except Fail as e:
+                tried.append({"provider": provider, "error": str(e)})
+                print(f"{provider} failed: {e}", file=sys.stderr)
+        else:
+            os.makedirs(a.out, exist_ok=True)
+            json.dump({"provider": None, "tried": tried}, open(os.path.join(a.out, "voice.json"), "w"), indent=1)
+            sys.exit("Blocked: voice provider. Tried: " + "; ".join(f"{t['provider']} ({t['error'][:120]})" for t in tried))
     words, duration = align(voice, a.local)
     meta = {"provider": provider, "voice": a.voice, "duration": duration, "words": len(words),
             "wordsPerSec": round(len(words) / duration, 2) if duration else 0,
-            "scriptMatch": match_ratio(script, words)}
+            "scriptMatch": match_ratio(script, words), "tried": tried}
     json.dump(words, open(os.path.join(a.out, "words.json"), "w"), indent=1)
     json.dump(meta, open(os.path.join(a.out, "voice.json"), "w"), indent=1)
     print(json.dumps(meta))
