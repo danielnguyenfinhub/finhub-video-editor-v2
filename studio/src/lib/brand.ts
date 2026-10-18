@@ -1,10 +1,18 @@
-import {loadFont} from '@remotion/google-fonts/Inter';
+import {loadFont} from '@remotion/fonts';
+import {staticFile} from 'remotion';
 
 // Source: _workspace/01_planner_scenes.json meta.brand. Named exports only.
-export const {fontFamily} = loadFont('normal', {
-	weights: ['400', '500', '600', '700', '800'],
-	subsets: ['latin'],
-});
+// Inter is bundled locally (@fontsource/inter, OFL-1.1) so renders never hit the network.
+export const fontFamily = 'Inter';
+for (const weight of ['400', '500', '600', '700', '800']) {
+	loadFont({
+		family: fontFamily,
+		url: staticFile(`fonts/inter/inter-latin-${weight}-normal.woff2`),
+		weight,
+		style: 'normal',
+		format: 'woff2',
+	});
+}
 
 export const BRAND = {
 	name: 'ReceptionAI',
