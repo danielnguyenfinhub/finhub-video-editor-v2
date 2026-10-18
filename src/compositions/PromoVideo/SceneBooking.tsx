@@ -4,14 +4,15 @@ import {CheckCircle2, CalendarPlus} from 'lucide-react';
 import {BookingCalendar, SALON_SATURDAY} from '../../components/ui/BookingCalendar';
 import {beatFrame, SlideUp, useRamp, useSpringAt} from '../../components/motion';
 import {COLORS, fontFamily} from '../../lib/brand';
-import {Stage, usePortrait, type SceneProps} from './shared';
+import {PORTRAIT_BOX, PORTRAIT_ZOOM, Stage, usePortrait, type SceneProps} from './shared';
 
-// Portrait: drop the first stylist column so names stay legible at 1080 wide.
+// Portrait: Sophie's column only, so the new booking's name and details fit untruncated at 864 wide.
+const SOPHIE = SALON_SATURDAY.incoming!.stylist;
 const PORTRAIT_DATA = {
 	...SALON_SATURDAY,
-	stylists: SALON_SATURDAY.stylists!.slice(1),
-	appointments: SALON_SATURDAY.appointments!.filter((a) => a.stylist > 0).map((a) => ({...a, stylist: a.stylist - 1})),
-	incoming: {...SALON_SATURDAY.incoming!, stylist: SALON_SATURDAY.incoming!.stylist - 1},
+	stylists: [SALON_SATURDAY.stylists![SOPHIE]],
+	appointments: SALON_SATURDAY.appointments!.filter((a) => a.stylist === SOPHIE).map((a) => ({...a, stylist: 0})),
+	incoming: {...SALON_SATURDAY.incoming!, stylist: 0},
 };
 // Landscape: 12–5 pm keeps the calendar plus the confirmation row inside the safe box.
 const LANDSCAPE_DATA = {
@@ -20,7 +21,7 @@ const LANDSCAPE_DATA = {
 	appointments: SALON_SATURDAY.appointments!.filter((a) => a.start >= 12),
 };
 
-const Pill: React.FC<{icon: React.ReactNode; text: string; bg: string; fg: string}> = ({icon, text, bg, fg}) => (
+const Pill: React.FC<{icon: React.ReactNode; text: string; bg: string; fg: string; size?: number}> = ({icon, text, bg, fg, size = 44}) => (
 	<div
 		style={{
 			display: 'flex',
@@ -30,7 +31,7 @@ const Pill: React.FC<{icon: React.ReactNode; text: string; bg: string; fg: strin
 			borderRadius: 999,
 			background: bg,
 			color: fg,
-			fontSize: 44,
+			fontSize: size,
 			fontWeight: 700,
 			whiteSpace: 'nowrap',
 			boxShadow: '0 12px 30px rgba(15,23,42,0.12)',
@@ -59,28 +60,29 @@ export const SceneBooking: React.FC<SceneProps> = ({scene, words}) => {
 	const data = portrait ? PORTRAIT_DATA : LANDSCAPE_DATA;
 
 	return (
-		<Stage w={portrait ? 1080 : 1560} h={portrait ? 1340 : 900} background={COLORS.canvas}>
-			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28, fontFamily}}>
+		// Landscape h 960 (was 900): content is ~916 tall, so 900 pushed the top pill above the 54px safe line.
+		<Stage w={portrait ? PORTRAIT_BOX.w : 1560} h={portrait ? PORTRAIT_BOX.h : 960} background={COLORS.canvas}>
+			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: portrait ? 40 : 28, fontFamily}}>
 				<div
 					style={{
 						display: 'flex',
 						flexDirection: portrait ? 'column' : 'row',
 						alignItems: 'center',
 						gap: 24,
-						minHeight: portrait ? 220 : 96,
+						minHeight: portrait ? 200 : 96,
 					}}
 				>
 					<SlideUp at={tLand}>
-						<Pill icon={<CheckCircle2 size={44} />} text={booked} bg={COLORS.primary} fg="#ffffff" />
+						<Pill icon={<CheckCircle2 size={44} />} text={booked} bg={COLORS.primary} fg="#ffffff" size={portrait ? 40 : 44} />
 					</SlideUp>
 					<SlideUp at={tCal}>
-						<Pill icon={<CalendarPlus size={44} />} text={added} bg={COLORS.successSoft} fg="#14532d" />
+						<Pill icon={<CalendarPlus size={44} />} text={added} bg={COLORS.successSoft} fg="#14532d" size={portrait ? 40 : 44} />
 					</SlideUp>
 				</div>
-				<div style={{opacity: Math.min(1, calIn * 1.5), transform: `translateY(${(1 - calIn) * 40}px)`}}>
+				<div style={{opacity: Math.min(1, calIn * 1.5), transform: `translateY(${(1 - calIn) * 40}px)`, zoom: portrait ? PORTRAIT_ZOOM : 1}}>
 					<BookingCalendar
 						{...data}
-						className={portrait ? 'w-[1080px]' : undefined}
+						style={portrait ? {width: PORTRAIT_BOX.w / PORTRAIT_ZOOM} : undefined}
 						appointments={data.appointments!}
 						stylists={data.stylists!}
 						startHour={data.startHour!}
