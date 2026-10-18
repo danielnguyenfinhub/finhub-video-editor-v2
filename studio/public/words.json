@@ -1,0 +1,397 @@
+[
+ {
+  "word": "Every",
+  "start": 0.0,
+  "end": 0.523
+ },
+ {
+  "word": "missed",
+  "start": 0.523,
+  "end": 1.045
+ },
+ {
+  "word": "call",
+  "start": 1.045,
+  "end": 1.568
+ },
+ {
+  "word": "during",
+  "start": 1.568,
+  "end": 2.091
+ },
+ {
+  "word": "peak",
+  "start": 2.091,
+  "end": 2.614
+ },
+ {
+  "word": "hour",
+  "start": 2.614,
+  "end": 3.136
+ },
+ {
+  "word": "is",
+  "start": 3.136,
+  "end": 3.659
+ },
+ {
+  "word": "a",
+  "start": 3.659,
+  "end": 4.182
+ },
+ {
+  "word": "booking",
+  "start": 4.182,
+  "end": 4.705
+ },
+ {
+  "word": "walking",
+  "start": 4.705,
+  "end": 5.227
+ },
+ {
+  "word": "out",
+  "start": 5.227,
+  "end": 5.75
+ },
+ {
+  "word": "the",
+  "start": 5.75,
+  "end": 6.273
+ },
+ {
+  "word": "door.",
+  "start": 6.273,
+  "end": 6.795
+ },
+ {
+  "word": "Your",
+  "start": 6.795,
+  "end": 7.318
+ },
+ {
+  "word": "hands",
+  "start": 7.318,
+  "end": 7.841
+ },
+ {
+  "word": "are",
+  "start": 7.841,
+  "end": 8.364
+ },
+ {
+  "word": "busy,",
+  "start": 8.364,
+  "end": 8.886
+ },
+ {
+  "word": "and",
+  "start": 8.886,
+  "end": 9.409
+ },
+ {
+  "word": "the",
+  "start": 9.409,
+  "end": 9.932
+ },
+ {
+  "word": "phone",
+  "start": 9.932,
+  "end": 10.455
+ },
+ {
+  "word": "keeps",
+  "start": 10.455,
+  "end": 10.977
+ },
+ {
+  "word": "ringing.",
+  "start": 10.977,
+  "end": 11.5
+ },
+ {
+  "word": "Meet",
+  "start": 12.0,
+  "end": 12.761
+ },
+ {
+  "word": "ReceptionAI.",
+  "start": 12.761,
+  "end": 13.522
+ },
+ {
+  "word": "It",
+  "start": 13.522,
+  "end": 14.283
+ },
+ {
+  "word": "answers",
+  "start": 14.283,
+  "end": 15.043
+ },
+ {
+  "word": "every",
+  "start": 15.043,
+  "end": 15.804
+ },
+ {
+  "word": "call,",
+  "start": 15.804,
+  "end": 16.565
+ },
+ {
+  "word": "day",
+  "start": 16.565,
+  "end": 17.326
+ },
+ {
+  "word": "or",
+  "start": 17.326,
+  "end": 18.087
+ },
+ {
+  "word": "night,",
+  "start": 18.087,
+  "end": 18.848
+ },
+ {
+  "word": "in",
+  "start": 18.848,
+  "end": 19.609
+ },
+ {
+  "word": "a",
+  "start": 19.609,
+  "end": 20.37
+ },
+ {
+  "word": "friendly",
+  "start": 20.37,
+  "end": 21.13
+ },
+ {
+  "word": "voice.",
+  "start": 21.13,
+  "end": 21.891
+ },
+ {
+  "word": "It",
+  "start": 21.891,
+  "end": 22.652
+ },
+ {
+  "word": "knows",
+  "start": 22.652,
+  "end": 23.413
+ },
+ {
+  "word": "your",
+  "start": 23.413,
+  "end": 24.174
+ },
+ {
+  "word": "services,",
+  "start": 24.174,
+  "end": 24.935
+ },
+ {
+  "word": "your",
+  "start": 24.935,
+  "end": 25.696
+ },
+ {
+  "word": "prices",
+  "start": 25.696,
+  "end": 26.457
+ },
+ {
+  "word": "and",
+  "start": 26.457,
+  "end": 27.217
+ },
+ {
+  "word": "your",
+  "start": 27.217,
+  "end": 27.978
+ },
+ {
+  "word": "opening",
+  "start": 27.978,
+  "end": 28.739
+ },
+ {
+  "word": "hours.",
+  "start": 28.739,
+  "end": 29.5
+ },
+ {
+  "word": "Callers",
+  "start": 30.0,
+  "end": 30.761
+ },
+ {
+  "word": "book,",
+  "start": 30.761,
+  "end": 31.522
+ },
+ {
+  "word": "change",
+  "start": 31.522,
+  "end": 32.283
+ },
+ {
+  "word": "or",
+  "start": 32.283,
+  "end": 33.043
+ },
+ {
+  "word": "cancel",
+  "start": 33.043,
+  "end": 33.804
+ },
+ {
+  "word": "appointments",
+  "start": 33.804,
+  "end": 34.565
+ },
+ {
+  "word": "while",
+  "start": 34.565,
+  "end": 35.326
+ },
+ {
+  "word": "you",
+  "start": 35.326,
+  "end": 36.087
+ },
+ {
+  "word": "stay",
+  "start": 36.087,
+  "end": 36.848
+ },
+ {
+  "word": "focused",
+  "start": 36.848,
+  "end": 37.609
+ },
+ {
+  "word": "on",
+  "start": 37.609,
+  "end": 38.37
+ },
+ {
+  "word": "the",
+  "start": 38.37,
+  "end": 39.13
+ },
+ {
+  "word": "client",
+  "start": 39.13,
+  "end": 39.891
+ },
+ {
+  "word": "in",
+  "start": 39.891,
+  "end": 40.652
+ },
+ {
+  "word": "your",
+  "start": 40.652,
+  "end": 41.413
+ },
+ {
+  "word": "chair.",
+  "start": 41.413,
+  "end": 42.174
+ },
+ {
+  "word": "Every",
+  "start": 42.174,
+  "end": 42.935
+ },
+ {
+  "word": "booking",
+  "start": 42.935,
+  "end": 43.696
+ },
+ {
+  "word": "lands",
+  "start": 43.696,
+  "end": 44.457
+ },
+ {
+  "word": "straight",
+  "start": 44.457,
+  "end": 45.217
+ },
+ {
+  "word": "in",
+  "start": 45.217,
+  "end": 45.978
+ },
+ {
+  "word": "your",
+  "start": 45.978,
+  "end": 46.739
+ },
+ {
+  "word": "calendar.",
+  "start": 46.739,
+  "end": 47.5
+ },
+ {
+  "word": "ReceptionAI.",
+  "start": 48.0,
+  "end": 49.045
+ },
+ {
+  "word": "Never",
+  "start": 49.045,
+  "end": 50.091
+ },
+ {
+  "word": "miss",
+  "start": 50.091,
+  "end": 51.136
+ },
+ {
+  "word": "another",
+  "start": 51.136,
+  "end": 52.182
+ },
+ {
+  "word": "salon",
+  "start": 52.182,
+  "end": 53.227
+ },
+ {
+  "word": "appointment.",
+  "start": 53.227,
+  "end": 54.273
+ },
+ {
+  "word": "Start",
+  "start": 54.273,
+  "end": 55.318
+ },
+ {
+  "word": "your",
+  "start": 55.318,
+  "end": 56.364
+ },
+ {
+  "word": "free",
+  "start": 56.364,
+  "end": 57.409
+ },
+ {
+  "word": "trial",
+  "start": 57.409,
+  "end": 58.455
+ },
+ {
+  "word": "today.",
+  "start": 58.455,
+  "end": 59.5
+ }
+]

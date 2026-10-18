@@ -1,0 +1,8 @@
+{
+ "provider": "provisional",
+ "duration": 60,
+ "words": 79,
+ "wordsPerSec": 1.32,
+ "scriptMatch": null,
+ "note": "Evenly spaced from spec; NOT real voice timing. Replace via voiceover.py once a TTS provider works."
+}
