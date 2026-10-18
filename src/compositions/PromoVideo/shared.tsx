@@ -11,6 +11,17 @@ export const usePortrait = () => {
 	return height > width;
 };
 
+/**
+ * Portrait design box = the 9:16 safe area of 1080x1920 (safeFor: 54 left, 162 right, 96 top, 384 bottom),
+ * so Stage scales by k=1 and design px are output px. Scenes lay out for this box directly.
+ */
+export const PORTRAIT_BOX = {w: 864, h: 1440};
+/**
+ * CSS zoom for 1080p UI components in portrait: their 28px secondary text renders at 32px, 40px body at 46px.
+ * Zoom (not transform) so the zoomed component also takes up the larger layout space.
+ */
+export const PORTRAIT_ZOOM = 1.15;
+
 // Landscape captions sit in the bottom ~140px; keep scene content above them.
 const CAPTION_RESERVE = 110;
 

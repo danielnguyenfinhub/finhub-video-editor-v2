@@ -3,7 +3,7 @@ import {interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
 import {IncomingCallToast} from '../../components/ui/IncomingCallToast';
 import {beatFrame, useGsapTimeline, useSpringAt, useRamp} from '../../components/motion';
 import {COLORS, fontFamily} from '../../lib/brand';
-import {Stage, usePortrait, type SceneProps} from './shared';
+import {PORTRAIT_BOX, PORTRAIT_ZOOM, Stage, usePortrait, type SceneProps} from './shared';
 
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 const ROW = 210; // toast stacking offset (manifest)
@@ -14,10 +14,11 @@ const CALLS = [
 	{caller: 'Chloe Martin', phone: '(415) 555-0119', time: '2:19 pm', note: 'Acrylic fill'},
 ];
 
-const Toast: React.FC<{i: number; enter: number; miss: number; innerRef: React.Ref<HTMLDivElement>}> = ({
+const Toast: React.FC<{i: number; enter: number; miss: number; w: number; innerRef: React.Ref<HTMLDivElement>}> = ({
 	i,
 	enter,
 	miss,
+	w,
 	innerRef,
 }) => {
 	const frame = useCurrentFrame();
@@ -25,7 +26,7 @@ const Toast: React.FC<{i: number; enter: number; miss: number; innerRef: React.R
 	const missed = useRamp(miss, 12);
 	return (
 		<div ref={innerRef} style={{position: 'absolute', top: 0, left: 0}}>
-			<IncomingCallToast {...CALLS[i]} progress={progress} missed={missed} ring={((frame - enter) % 30) / 30} />
+			<IncomingCallToast {...CALLS[i]} style={{width: w}} progress={progress} missed={missed} ring={((frame - enter) % 30) / 30} />
 		</div>
 	);
 };
@@ -58,31 +59,32 @@ export const SceneProblem: React.FC<SceneProps> = ({scene, words}) => {
 		[enters.join(), fps],
 	);
 
-	const stackW = 880;
+	// Portrait: 750-wide toasts zoomed 1.15 fill the 864 safe width.
+	const stackW = portrait ? PORTRAIT_BOX.w / PORTRAIT_ZOOM : 880;
 	const stackH = ROW * 2 + 200;
-	const counterSize = portrait ? 220 : 240;
+	const counterSize = portrait ? 260 : 240;
 
 	return (
-		<Stage w={portrait ? 900 : 1728} h={portrait ? 1400 : 860} background={COLORS.canvas}>
+		<Stage w={portrait ? PORTRAIT_BOX.w : 1728} h={portrait ? PORTRAIT_BOX.h : 860} background={COLORS.canvas}>
 			<div
 				style={{
 					display: 'flex',
 					flexDirection: portrait ? 'column' : 'row',
 					alignItems: 'center',
-					gap: portrait ? 120 : 96,
+					gap: portrait ? 72 : 96,
 					fontFamily,
 				}}
 			>
-				<div style={{position: 'relative', width: stackW, height: stackH}}>
+				<div style={{position: 'relative', width: stackW, height: stackH, zoom: portrait ? PORTRAIT_ZOOM : 1}}>
 					{refs.map((r, i) => (
 						<div key={i} style={{position: 'absolute', inset: 0, zIndex: i}}>
-							<Toast i={i} enter={enters[i]} miss={misses[i]} innerRef={r} />
+							<Toast i={i} enter={enters[i]} miss={misses[i]} w={stackW} innerRef={r} />
 						</div>
 					))}
 				</div>
 				<div
 					style={{
-						width: 640,
+						width: portrait ? PORTRAIT_BOX.w : 640,
 						display: 'flex',
 						flexDirection: 'column',
 						alignItems: portrait ? 'center' : 'flex-start',
@@ -104,7 +106,7 @@ export const SceneProblem: React.FC<SceneProps> = ({scene, words}) => {
 					>
 						{Math.max(1, lost)}
 					</span>
-					<span style={{fontSize: 72, fontWeight: 700, color: COLORS.ink, lineHeight: 1.1}}>
+					<span style={{fontSize: portrait ? 80 : 72, fontWeight: 700, color: COLORS.ink, lineHeight: 1.1}}>
 						{/* Ends on the spec's onScreenText verbatim: "3 bookings lost today". */}
 						{lost === 3 ? scene.onScreenText[1] : `${Math.max(1, lost)} booking${lost > 1 ? 's' : ''} lost today`}
 					</span>

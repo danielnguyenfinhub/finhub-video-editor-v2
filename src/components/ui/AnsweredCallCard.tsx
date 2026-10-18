@@ -79,9 +79,9 @@ export function AnsweredCallCard({
 				</div>
 				<div className="flex shrink-0 flex-col items-end gap-2">
 					<Badge style={{background: tone}}>{isAnswered ? 'Answered' : 'Missed call'}</Badge>
-					<span className="text-[28px] font-medium text-slate-600 tabular-nums">
-						{isAnswered ? mmss(elapsedSec) : '0:00'}
-					</span>
+					{isAnswered ? (
+						<span className="text-[28px] font-medium text-slate-600 tabular-nums">{mmss(elapsedSec)}</span>
+					) : null}
 				</div>
 			</CardHeader>
 			<CardContent className="flex flex-col gap-6 px-10">
@@ -101,7 +101,8 @@ export function AnsweredCallCard({
 				>
 					“{transcript}”
 				</p>
-				{children}
+				{/* Opacity, not unmount: keeps card height stable through the missed -> answered morph. */}
+				<div style={{opacity: isAnswered ? interpolate(answered, [0.5, 1], [0, 1], clamp) : 0}}>{children}</div>
 			</CardContent>
 		</Card>
 	);
