@@ -48,19 +48,21 @@ export function AppointmentBlock({
   className,
   style,
 }: AppointmentBlockProps) {
+  // Most important first: segments that don't fit wrap onto a hidden row, so the
+  // line drops whole trailing segments instead of ellipsising mid-word.
   const meta = [
     a.service,
+    formatTime(a.start),
     `${a.durationMin} min`,
     a.price != null ? `$${a.price}` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  ].filter((m): m is string => Boolean(m));
   const glow = Math.min(1, Math.max(0, highlight));
 
   return (
     <div
       className={cn(
         "relative flex h-full flex-col justify-center overflow-hidden rounded-xl px-4",
+        featured && "py-3",
         className,
       )}
       style={{
@@ -72,9 +74,11 @@ export function AppointmentBlock({
         transform: `translateX(${interpolate(progress, [0, 1], [240, 0])}px)`,
         boxShadow: `0 0 0 ${6 * glow}px rgba(79,70,229,${0.35 * glow}), 0 ${12 * glow}px ${40 * glow}px rgba(79,70,229,${0.45 * glow})`,
         ...style,
+        // Featured: always fits 40px name + 28px meta (line-height 1.375) + py-3, plus headroom.
+        ...(featured ? { minHeight: 40 * 1.25 + 28 * 1.375 + 24 + 12 } : null),
       }}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex shrink-0 items-center justify-between gap-3">
         <span
           className={cn(
             "truncate leading-tight font-semibold",
@@ -112,14 +116,22 @@ export function AppointmentBlock({
           </svg>
         ) : null}
       </div>
-      <span
-        className={cn(
-          "truncate text-[28px] leading-tight",
-          featured ? "text-indigo-50" : "text-slate-700",
-        )}
-      >
-        {featured ? `${meta} · ${formatTime(a.start)}` : a.service}
-      </span>
+      {featured ? (
+        <div
+          className="flex shrink-0 flex-wrap overflow-hidden text-[28px] leading-[1.375] text-indigo-50"
+          style={{ height: 28 * 1.375 }}
+        >
+          {meta.map((m, i) => (
+            <span key={m} className="whitespace-nowrap">
+              {i > 0 ? ` · ${m}` : m}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <span className="truncate text-[28px] leading-tight text-slate-700">
+          {a.service}
+        </span>
+      )}
     </div>
   );
 }
