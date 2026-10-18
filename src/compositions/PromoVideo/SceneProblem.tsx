@@ -30,7 +30,7 @@ const Toast: React.FC<{i: number; enter: number; miss: number; innerRef: React.R
 	);
 };
 
-export const S01Problem: React.FC<SceneProps> = ({scene, words}) => {
+export const SceneProblem: React.FC<SceneProps> = ({scene, words}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
 	const portrait = usePortrait();

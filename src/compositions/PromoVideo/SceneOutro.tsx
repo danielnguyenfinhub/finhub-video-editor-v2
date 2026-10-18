@@ -5,7 +5,7 @@ import {beatFrame, SlideUp, SpringScale, useRamp, useSpringAt} from '../../compo
 import {fontFamily} from '../../lib/brand';
 import {Stage, usePortrait, type SceneProps} from './shared';
 
-export const S04Outro: React.FC<SceneProps> = ({scene, meta, words}) => {
+export const SceneOutro: React.FC<SceneProps> = ({scene, meta, words}) => {
 	const {fps} = useVideoConfig();
 	const portrait = usePortrait();
 	const b = (w: string) => beatFrame(words, scene, w, fps);

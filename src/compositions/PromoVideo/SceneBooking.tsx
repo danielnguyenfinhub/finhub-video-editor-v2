@@ -41,7 +41,7 @@ const Pill: React.FC<{icon: React.ReactNode; text: string; bg: string; fg: strin
 	</div>
 );
 
-export const S03Booking: React.FC<SceneProps> = ({scene, words}) => {
+export const SceneBooking: React.FC<SceneProps> = ({scene, words}) => {
 	const {fps} = useVideoConfig();
 	const portrait = usePortrait();
 	const b = (w: string) => beatFrame(words, scene, w, fps);

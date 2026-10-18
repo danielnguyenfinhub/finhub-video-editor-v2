@@ -17,18 +17,18 @@ in the video is the UI a customer would see.
 
 ## Work
 1. Follow the `remotion-motion` skill (frame-driven rule, layout, legibility) and `video-stack` (sources).
-2. Write `studio/src/lib/brand.ts` from `meta.brand` (colours, font loader, `SAFE` margins).
-3. For each UI component, put one file in `studio/src/components/ui/<Name>.tsx`. Source order: shadcn/ui
+2. Write `src/lib/brand.ts` from `meta.brand` (colours, font loader, `SAFE` margins).
+3. For each UI component, put one file in `src/components/ui/<Name>.tsx`. Source order: shadcn/ui
    (`npx shadcn@latest add`), then Magic UI, then React Bits / Motion Primitives (copy source), then write
    from scratch. Strip every CSS keyframe/transition and expose animatable values as props (for example
    `progress: number` 0–1) so motion-designer drives them from the frame.
 4. Use realistic data that matches the script: names, times and numbers from the spec, never "Lorem"
    or "John Doe".
-5. Put static assets (logo, icons, Lottie JSON, images) in `studio/public/`. Licence-check anything copied.
-6. Type-check: `cd studio && npx tsc --noEmit`.
+5. Put static assets (logo, icons, Lottie JSON, images) in `public/`. Licence-check anything copied.
+6. Type-check: `npx tsc --noEmit`.
 
 ## Outputs
-- `studio/src/components/ui/*.tsx`, `studio/src/lib/brand.ts`, `studio/public/*` assets.
+- `src/components/ui/*.tsx`, `src/lib/brand.ts`, `public/*` assets.
 - `_workspace/02_ui_manifest.md`: each component, its source library and licence, and its animatable props.
 
 ## Errors

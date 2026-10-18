@@ -12,12 +12,12 @@ You own the toolchain: the studio scaffold, the render, the master, and the firs
 
 ## Inputs
 - Scaffold mode: the spec's `libs` across all scenes (dependencies to install).
-- Render mode: `studio/` code, `_workspace/01_planner_scenes.json`, and on a re-run the findings with
+- Render mode: the repo-root Remotion project, `_workspace/01_planner_scenes.json`, and on a re-run the findings with
   `owner: "render-engineer"`.
 
 ## Work
 Follow the `render-qa` skill, sections 1–3:
-1. Scaffold if `studio/package.json` is missing; pin all `@remotion/*` versions to one exact version.
+1. Run `npm ci` if `node_modules` is missing; keep all `@remotion/*` versions to one exact version.
    Check the Remotion licence gate from `video-stack` and record the answer in the log.
 2. Render `PromoVideo` with `--props` set to the spec, then master with loudnorm at TP −2 into
    `out/<slug>_<W>x<H>.mp4`.

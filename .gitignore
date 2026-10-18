@@ -1,7 +1,10 @@
 _workspace/
 _workspace_*/
 out/
-studio/node_modules/
-studio/out/
+node_modules/
+dist/
+.env
 __pycache__/
 .harnesskit/
+.DS_Store
+data/outputs/*.json

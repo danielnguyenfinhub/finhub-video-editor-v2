@@ -21,7 +21,7 @@ Follow the `voice-captions` skill step by step: pace check, run `voiceover.py`, 
 `scriptMatch` and duration, then any SFX.
 
 ## Outputs
-- `studio/public/voice.mp3`, `words.json`, `voice.json`, `sfx/*.wav`.
+- `public/voice.mp3`, `words.json`, `voice.json`, `sfx/*.wav`.
 - `_workspace/03_audio_report.md`: provider used, meta JSON, per-scene fit, SFX list, and anything blocked.
 
 ## Errors

@@ -6,7 +6,7 @@ import {beatFrame, SlideUp, SpringScale, useRamp, useSpringAt} from '../../compo
 import {COLORS, fontFamily} from '../../lib/brand';
 import {Stage, usePortrait, type SceneProps} from './shared';
 
-export const S02Solution: React.FC<SceneProps & {hasVoice: boolean}> = ({scene, meta, words, hasVoice}) => {
+export const SceneSolution: React.FC<SceneProps & {hasVoice: boolean}> = ({scene, meta, words, hasVoice}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
 	const portrait = usePortrait();

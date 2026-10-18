@@ -22,10 +22,10 @@ names below), launching UI and Audio in one message.
 | Agent (`agentType`) | Model | Skill(s) | Writes |
 | --- | --- | --- | --- |
 | video-planner | opus | video-stack | `_workspace/01_planner_*` |
-| ui-asset-builder | opus | remotion-motion, video-stack | `studio/src/components/ui`, `_workspace/02_ui_manifest.md` |
-| audio-engineer | sonnet | voice-captions | `studio/public/voice*`, `words.json`, `_workspace/03_audio_report.md` |
-| motion-designer | opus | remotion-motion | `studio/src/app/Root.tsx`, `studio/src/compositions/`, `_workspace/04_motion_notes.md` |
-| render-engineer | sonnet | render-qa, video-stack | `studio/` scaffold, `out/*.mp4`, `_workspace/05_render_log.md` |
+| ui-asset-builder | opus | remotion-motion, video-stack | `src/components/ui`, `_workspace/02_ui_manifest.md` |
+| audio-engineer | sonnet | voice-captions | `public/voice*`, `words.json`, `_workspace/03_audio_report.md` |
+| motion-designer | opus | remotion-motion | `src/app/Root.tsx`, `src/compositions/`, `_workspace/04_motion_notes.md` |
+| render-engineer | sonnet | render-qa, video-stack | `pipelines/render.ts`, `out/*.mp4`, `data/outputs/`, `_workspace/05_render_log.md` |
 | video-qa | opus | render-qa | QA report (returned; saved to `_workspace/05_qa_report.json`) |
 
 Data contract: `references/scene-spec.md`. Every file handoff goes through `_workspace/` using
@@ -76,7 +76,7 @@ phase('Plan')   // planning and scaffolding are independent
 const [plan, scaffold] = await parallel([
   () => agent(`Brief:\n${args.brief}\n\nWrite and validate the scene spec.`,
     { agentType: 'video-planner', phase: 'Plan', schema: PLAN }),
-  () => agent('Scaffold studio/ if missing (render-qa section 1). Do not render.',
+  () => agent('Run npm ci if node_modules is missing (render-qa section 1). Do not render.',
     { agentType: 'render-engineer', phase: 'Plan', schema: STEP }),
 ])
 note('render-engineer(scaffold)', scaffold)

@@ -1,4 +1,4 @@
 import { registerRoot } from "remotion";
-import { RemotionRoot } from "./app/Root";
+import { RemotionRoot } from "./Root";
 
 registerRoot(RemotionRoot);

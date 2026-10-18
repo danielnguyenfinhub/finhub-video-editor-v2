@@ -3,7 +3,7 @@ import {Composition, staticFile, type CalculateMetadataFunction} from 'remotion'
 import {loadWords} from '../components/audio/loadWords';
 import {PromoVideo} from '../compositions/PromoVideo/Composition';
 import {promoSchema, type PromoProps} from '../compositions/PromoVideo/schema';
-import spec from '../../../data/templates/video-spec.json';
+import spec from '../../data/templates/video-spec.json';
 
 const exists = async (file: string) => {
 	try {

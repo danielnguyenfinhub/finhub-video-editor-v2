@@ -19,10 +19,10 @@ provider-specific alignment format.
 3. Generate and align:
    ```bash
    python3 .claude/skills/voice-captions/scripts/voiceover.py \
-     --text _workspace/03_audio_script.txt --out studio/public [--voice <id>] [--local]
+     --text _workspace/03_audio_script.txt --out public [--voice <id>] [--local]
    ```
    The script prints `{provider, duration, words, wordsPerSec, scriptMatch}` and writes
-   `studio/public/{voice.mp3, words.json, voice.json}`.
+   `public/{voice.mp3, words.json, voice.json}`.
 4. Accept only if `scriptMatch ≥ 0.9` and `duration ≤ total spec length + 0.5 s`. A low match means the
    voice skipped or mangled a line, so regenerate once; if it is still low, report the lines that differ.
 5. Write `_workspace/03_audio_report.md` with the meta JSON, the scene-by-scene fit, and any SFX added.
@@ -43,5 +43,5 @@ Vietnamese text (Whisper handles diacritics, but expect a lower ratio, so accept
 
 ## SFX (optional, from spec `sfx`)
 
-Render Tone.js cues offline (`Tone.Offline`) to WAV in `studio/public/sfx/`, named `<sceneId>-<cue>.wav`,
+Render Tone.js cues offline (`Tone.Offline`) to WAV in `public/sfx/`, named `<sceneId>-<cue>.wav`,
 and list them with their trigger word in the report. Keep SFX peaks at least 12 dB under the voice.

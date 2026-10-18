@@ -25,7 +25,7 @@ Follow the `render-qa` skill, sections 3–5:
 2. Re-run `check_spec.py` on the spec.
 3. Read every still and compare it with its scene in the spec, using the visual review table.
 4. Check caption sync on 3 words spread across the video: render the stills at
-   `round(word.start × fps)` with `npx remotion still` (from `studio/`, adding `--browser-executable` as in
+   `round(word.start × fps)` with `npx remotion still` (from the repo root, adding `--browser-executable` as in
    render-qa §1 where needed). The highlighted word must be that word.
 5. Compliance: verbatim disclaimer present for `minSeconds`; no unsourced rate, saving or approval claim;
    no `[PLACEHOLDER]` or `MISSING` left anywhere on screen.
