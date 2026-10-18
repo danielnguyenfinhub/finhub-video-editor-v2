@@ -1,6 +1,6 @@
 ---
 name: remotion-motion
-description: "Rules for writing Remotion scenes, UI mockups and motion in studio/: frame-driven animation, Sequence timing, GSAP/Three.js/Lottie/Motion bridging, captions, fonts, assets and data-driven props. Use whenever code under studio/src is written or fixed: building a scene from the scene spec, porting a shadcn/Magic UI/React Bits component into a scene, adding a 3D shot, or fixing a QA finding about timing, clipping or flicker. Not for choosing libraries (video-stack) or rendering/encoding (render-qa)."
+description: "Rules for writing Remotion scenes, UI mockups and motion: frame-driven animation, Sequence timing, GSAP/Three.js/Lottie/Motion bridging, captions, fonts, assets and data-driven props. Use whenever code under src/ is written or fixed: building a scene from the scene spec, porting a shadcn/Magic UI/React Bits component into a scene, adding a 3D shot, or fixing a QA finding about timing, clipping or flicker. Not for choosing libraries (video-stack) or rendering/encoding (render-qa)."
 ---
 
 # Remotion Motion Rules
@@ -13,22 +13,24 @@ a pure function of `useCurrentFrame()`**. Anything that keeps its own clock (CSS
 correctly in preview, then flickers or freezes in the final MP4. Most "works in Studio, broken in
 render" bugs come from this.
 
-## Project layout (created by render-engineer on the first run)
+## Project layout (repo root)
 
 ```
-studio/
-  src/index.ts                                # registerRoot
-  src/app/Root.tsx                            # registers PromoVideo (+ PromoVideo-9x16) with zod schema + calculateMetadata
-  src/compositions/PromoVideo/Composition.tsx # <Series> of scenes, <Audio> voice, captions, compliance overlay
-  src/compositions/PromoVideo/<scene-id>.tsx  # one file per scene in the spec; the filename is the scene id
-  src/components/ui/                          # shadcn/Magic UI/React Bits components, frame-driven
-  src/components/motion/                      # reusable frame-driven primitives (FadeIn, SlideUp, GsapTimeline)
-  src/components/audio/                       # Captions, waveform
-  src/lib/brand.ts                            # colours, fonts, safe-area constants from spec.meta.brand
-  src/styles/globals.css                      # Tailwind v4 (@remotion/tailwind-v4)
-  public/                                     # voice.mp3, words.json, images, lottie JSON (via staticFile())
-data/templates/video-spec.json                # (repo root) starter spec; copy to _workspace/01_planner_scenes.json
+src/app/index.ts                            # registerRoot
+src/app/Root.tsx                            # registers PromoVideo (+ PromoVideo-9x16) with zod schema + calculateMetadata
+src/compositions/PromoVideo/Composition.tsx # <Series> of scenes via the SCENES map (scene id → component), audio, captions, compliance
+src/compositions/PromoVideo/Scene<Name>.tsx # one PascalCase file per scene; add each new one to the SCENES map
+src/components/ui/                          # shadcn/Magic UI/React Bits components, frame-driven
+src/components/motion/                      # reusable frame-driven primitives (FadeIn, SlideUp, useGsapTimeline, beatFrame)
+src/components/audio/                       # Captions, VoiceWaveform, loadWords
+src/lib/brand.ts                            # colours, local Inter font, safe-area constants
+src/styles/globals.css                      # Tailwind v4 (@remotion/tailwind-v4) + @config tailwind.config.js
+public/                                     # voice.mp3, words.json, fonts, images (via staticFile())
+pipelines/                                  # voice.ts (ElevenLabs), transcribe.py (Whisper), render.ts (render+master+probe)
+data/templates/video-spec.json              # starter spec; copy to _workspace/01_planner_scenes.json
+data/outputs/                               # render manifests written by pipelines/render.ts
 ```
+Topic notes for quick reference: `.claude/skills/remotion-rules.md`, `gsap-motion.md`, `audio-sync.md`.
 Before writing a new primitive, check `components/motion/` and `components/ui/`; reuse beats re-writing.
 
 The composition reads its props from `_workspace/01_planner_scenes.json` (passed with `--props`).

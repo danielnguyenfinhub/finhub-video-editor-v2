@@ -12,5 +12,6 @@
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true
   },
+  "include": ["src/**/*", "pipelines/**/*.ts"],
   "exclude": ["remotion.config.ts"]
 }

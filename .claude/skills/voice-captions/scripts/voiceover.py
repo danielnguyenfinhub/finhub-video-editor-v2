@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Voiceover + word timings for the video studio.
 
-  voiceover.py --text script.txt --out studio/public [--voice ID] [--provider auto|elevenlabs|openai]
-  voiceover.py --audio existing.mp3 --text script.txt --out studio/public   # align only
+  voiceover.py --text script.txt --out public [--voice ID] [--provider auto|elevenlabs|openai]
+  voiceover.py --audio existing.mp3 --text script.txt --out public   # align only
   add --local to align with faster-whisper on this machine (no API credits needed)
   voiceover.py --selftest
 

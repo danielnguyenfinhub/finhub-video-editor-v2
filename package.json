@@ -9,15 +9,19 @@
   },
   "private": true,
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "2.73.0",
     "@fontsource/inter": "5.3.0",
+    "@remotion/bundler": "4.0.536",
     "@remotion/cli": "4.0.536",
     "@remotion/fonts": "4.0.536",
     "@remotion/google-fonts": "4.0.536",
     "@remotion/media-utils": "4.0.536",
+    "@remotion/renderer": "4.0.536",
     "@remotion/tailwind-v4": "4.0.536",
     "@remotion/transitions": "4.0.536",
     "@remotion/zod-types": "4.0.536",
     "clsx": "2.1.1",
+    "dotenv": "18.0.8",
     "gsap": "3.15.0",
     "lucide-react": "1.59.0",
     "motion": "14.3.0",
@@ -34,11 +38,15 @@
     "@types/web": "0.0.166",
     "eslint": "10.12.0",
     "prettier": "3.8.1",
+    "tsx": "4.23.15",
     "typescript": "5.9.3"
   },
   "scripts": {
-    "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts",
+    "studio": "remotion studio src/app/index.ts",
+    "render": "remotion render src/app/index.ts",
+    "build:video": "tsx pipelines/render.ts",
+    "voice": "tsx pipelines/voice.ts",
+    "transcribe": "python3 pipelines/transcribe.py public/voice.mp3 public/words.json",
     "typecheck": "tsc --noEmit"
   },
   "allowScripts": {

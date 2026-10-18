@@ -5,16 +5,16 @@ import {beatFrame} from '../../components/motion';
 import {fontFamily} from '../../lib/brand';
 import type {PromoProps, Scene} from './schema';
 import type {SceneProps} from './shared';
-import {S01Problem} from './s01-problem';
-import {S02Solution} from './s02-solution';
-import {S03Booking} from './s03-booking';
-import {S04Outro} from './s04-outro';
+import {SceneProblem} from './SceneProblem';
+import {SceneSolution} from './SceneSolution';
+import {SceneBooking} from './SceneBooking';
+import {SceneOutro} from './SceneOutro';
 
 const SCENES: Record<string, React.FC<SceneProps & {hasVoice: boolean}>> = {
-	's01-problem': S01Problem,
-	's02-solution': S02Solution,
-	's03-booking': S03Booking,
-	's04-outro': S04Outro,
+	's01-problem': SceneProblem,
+	's02-solution': SceneSolution,
+	's03-booking': SceneBooking,
+	's04-outro': SceneOutro,
 };
 
 const frames = (sec: number, fps: number) => Math.round(sec * fps);
